@@ -14,4 +14,5 @@ export const globalState = {
     value: 0,
   },
   app: null as App | null,
+  debugHolderEl: document.createElement("p") as HTMLElement, // just to avoid null
 };

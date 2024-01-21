@@ -4,6 +4,13 @@ import { App } from "./App";
 
 document.addEventListener("DOMContentLoaded", async () => {
   deferByFrame(async () => {
+    const debugHolderEl = document.querySelector(
+      ".debug-holder"
+    ) as HTMLElement;
+    if (debugHolderEl) {
+      globalState.debugHolderEl = debugHolderEl;
+    }
+
     // const { App } = await import("./App");
     globalState.app = new App();
   });
