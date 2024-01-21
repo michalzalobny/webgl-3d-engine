@@ -1,0 +1,11 @@
+.debug-holder {
+  position: fixed;
+  z-index: 100;
+  top: 50px;
+  right: 50px;
+  color: red;
+  background-color: white;
+  border: 1px solid red;
+  font-size: 14px;
+  // visibility: hidden;
+}

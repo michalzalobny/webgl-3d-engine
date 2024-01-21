@@ -1,0 +1,28 @@
+.c-large {
+  position: relative;
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 var(--s-1);
+
+  @media only screen and (min-width: 768px) {
+    padding: 0 var(--s-2);
+  }
+}
+
+.c-big {
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 0 var(--s-1);
+}
+
+.c-medium {
+  max-width: 955px;
+  margin: 0 auto;
+  padding: 0 var(--s-1);
+}
+
+.c-small {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 var(--s-1);
+}

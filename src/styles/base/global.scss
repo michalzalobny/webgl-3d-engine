@@ -1,0 +1,138 @@
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+//Disable on touch devices
+@media (hover: hover) {
+  [data-js-focus-visible] :focus:not([data-focus-visible-added]) {
+    outline: none;
+  }
+}
+
+html {
+  box-sizing: border-box;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+
+  font-family: "Lato", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Ubuntu, "Helvetica Neue", sans-serif;
+}
+
+body {
+  overflow-y: scroll;
+  color: var(--foreground-rgb);
+  background: var(--foreground-rgb);
+  font-size: var(--font-size-1);
+  line-height: 1.6;
+
+  // &:before {
+  //   content: "";
+  //   position: absolute;
+  //   top: 50%;
+  //   left: 0;
+  //   height: 1px;
+  //   width: 100%;
+  //   background-color: red;
+  //   z-index: 1;
+  // }
+}
+
+html {
+  background: var(--background-rgb);
+}
+
+a {
+  color: inherit;
+  pointer-events: auto;
+  text-decoration: none;
+  display: inline-block;
+}
+
+a[href^="tel"] {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  background: none;
+  border: none;
+  border-radius: none;
+  color: inherit;
+  font: inherit;
+  pointer-events: auto;
+}
+
+input,
+textarea {
+  appearance: none;
+  background: none;
+  border: none;
+  border-radius: 0;
+  pointer-events: auto;
+}
+
+img,
+svg {
+  vertical-align: center;
+}
+
+canvas {
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+//Creative
+
+body {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 99.98%; //99.95%
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+img {
+  user-select: none;
+  pointer-events: none;
+}
+
+*,
+*:before,
+*:after {
+  user-select: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
