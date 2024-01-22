@@ -95,7 +95,6 @@ canvas {
 }
 
 //Creative
-
 body {
   position: fixed;
   top: 0;
@@ -104,6 +103,7 @@ body {
   height: 99.98%; //99.95%
   overflow: hidden;
   overscroll-behavior: none;
+  background-color: black;
 }
 
 html {

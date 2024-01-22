@@ -11,6 +11,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       globalState.debugHolderEl = debugHolderEl;
     }
 
+    const canvasEl = document.getElementById("canvas") as HTMLCanvasElement;
+    if (canvasEl) {
+      globalState.canvasEl = canvasEl;
+    }
+
     // const { App } = await import("./App");
     globalState.app = new App();
   });
