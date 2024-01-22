@@ -4,17 +4,13 @@ import { App } from "./App";
 
 document.addEventListener("DOMContentLoaded", async () => {
   deferByFrame(async () => {
-    const debugHolderEl = document.querySelector(
+    globalState.debugHolderEl = document.querySelector(
       ".debug-holder"
-    ) as HTMLElement;
-    if (debugHolderEl) {
-      globalState.debugHolderEl = debugHolderEl;
-    }
+    ) as HTMLDivElement;
 
-    const canvasEl = document.getElementById("canvas") as HTMLCanvasElement;
-    if (canvasEl) {
-      globalState.canvasEl = canvasEl;
-    }
+    globalState.canvasEl = document.getElementById(
+      "canvas"
+    ) as HTMLCanvasElement;
 
     // const { App } = await import("./App");
     globalState.app = new App();

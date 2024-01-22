@@ -20,6 +20,7 @@ export class App {
   _onResizeDebounced = debounce(() => this._onResize(), 300);
 
   _onResize() {
+    if (!globalState.canvasEl) return;
     const stageX = globalState.canvasEl.clientWidth;
     const stageY = globalState.canvasEl.clientHeight;
 

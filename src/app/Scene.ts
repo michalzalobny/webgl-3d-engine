@@ -5,11 +5,10 @@ export class Scene {
   gl: WebGL2RenderingContext | null = null;
 
   constructor() {
-    // Change canvas color to red
-    this.gl = globalState.canvasEl.getContext("webgl2");
-    if (!this.gl) {
-      throw new Error("WebGL2 not supported");
+    if (globalState.canvasEl) {
+      this.gl = globalState.canvasEl.getContext("webgl2");
     }
+    if (!this.gl) throw new Error("WebGL2 not supported");
 
     this.gl.clearColor(1, 0, 0, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);

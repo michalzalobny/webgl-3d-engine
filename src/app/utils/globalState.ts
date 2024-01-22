@@ -14,6 +14,6 @@ export const globalState = {
     value: 0,
   },
   app: null as App | null,
-  debugHolderEl: document.createElement("p") as HTMLElement, // just to avoid null
-  canvasEl: document.createElement("canvas") as HTMLCanvasElement, // just to avoid null
+  debugHolderEl: null as HTMLDivElement | null,
+  canvasEl: null as HTMLCanvasElement | null,
 };
