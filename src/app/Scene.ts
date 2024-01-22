@@ -1,6 +1,9 @@
 import { updateDebug } from "./utils/updateDebug";
 import { globalState } from "./utils/globalState";
 
+import fragmentShaderSource from "./shaders/default/fragment.glsl";
+import vertexShaderSource from "./shaders/default/vertex.glsl";
+
 export class Scene {
   gl: WebGL2RenderingContext | null = null;
 
@@ -9,31 +12,31 @@ export class Scene {
       this.gl = globalState.canvasEl.getContext("webgl2");
     }
     if (!this.gl) throw new Error("WebGL2 not supported");
-
     this._setup();
   }
 
   update() {}
 
   onResize() {
-    updateDebug(globalState.stageSize.value.join(" x "));
+    const width = globalState.stageSize.value[0];
+    const height = globalState.stageSize.value[1];
+    this.gl?.viewport(0, 0, width, height);
 
-    const gl = this.gl;
-    if (!gl) return;
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    updateDebug(globalState.stageSize.value.join(" x "));
   }
 
   onPixelRatioChange() {}
 
   destroy() {}
 
-  // Returns a random integer from 0 to range - 1.
-  randomInt(range) {
-    return Math.floor(Math.random() * range);
-  }
-
   // Fill the buffer with the values that define a rectangle.
-  setRectangle(gl, x, y, width, height) {
+  setRectangle(
+    gl: WebGL2RenderingContext,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ) {
     var x1 = x;
     var x2 = x + width;
     var y1 = y;
@@ -46,52 +49,18 @@ export class Scene {
   }
 
   _setup() {
-    var vertexShaderSource = `#version 300 es
-
-    // an attribute is an input (in) to a vertex shader.
-    // It will receive data from a buffer
-    in vec2 a_position;
-    
-    // Used to pass in the resolution of the canvas
-    uniform vec2 u_resolution;
-    
-    // all shaders have a main function
-    void main() {
-    
-      // convert the position from pixels to 0.0 to 1.0
-      vec2 zeroToOne = a_position / u_resolution;
-    
-      // convert from 0->1 to 0->2
-      vec2 zeroToTwo = zeroToOne * 2.0;
-    
-      // convert from 0->2 to -1->+1 (clipspace)
-      vec2 clipSpace = zeroToTwo - 1.0;
-    
-      gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-    }
-    `;
-
-    var fragmentShaderSource = `#version 300 es
-    
-    precision highp float;
-    
-    uniform vec4 u_color;
-    
-    // we need to declare an output for the fragment shader
-    out vec4 outColor;
-    
-    void main() {
-      outColor = u_color;
-    }
-    `;
-
     const gl = this.gl;
 
     if (!gl) return;
 
     // Use our boilerplate utils to compile the shaders and link into a program
-    function createShader(gl, type, source) {
+    function createShader(
+      gl: WebGL2RenderingContext,
+      type: number,
+      source: string
+    ) {
       var shader = gl.createShader(type);
+      if (!shader) throw new Error(`Shader not created for type ${type}`);
       gl.shaderSource(shader, source);
       gl.compileShader(shader);
       var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
@@ -110,8 +79,16 @@ export class Scene {
       fragmentShaderSource
     );
 
-    function createProgram(gl, vertexShader, fragmentShader) {
+    if (!vertexShader || !fragmentShader)
+      throw new Error("Could not create shaders");
+
+    function createProgram(
+      gl: WebGL2RenderingContext,
+      vertexShader: WebGLShader,
+      fragmentShader: WebGLShader
+    ) {
       var program = gl.createProgram();
+      if (!program) throw new Error("Program not created");
       gl.attachShader(program, vertexShader);
       gl.attachShader(program, fragmentShader);
       gl.linkProgram(program);
@@ -125,15 +102,11 @@ export class Scene {
     }
 
     var program = createProgram(gl, vertexShader, fragmentShader);
+    if (!program) throw new Error("Could not create program");
 
     // look up where the vertex data needs to go.
     var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
 
-    // look up uniform locations
-    var resolutionUniformLocation = gl.getUniformLocation(
-      program,
-      "u_resolution"
-    );
     var colorLocation = gl.getUniformLocation(program, "u_color");
 
     // Create a buffer
@@ -166,23 +139,6 @@ export class Scene {
       offset
     );
 
-    const canvas = gl.canvas;
-    if (!canvas) return;
-    const multiplier = 2 || 1;
-    const width = (canvas.clientWidth * multiplier) | 0;
-    const height = (canvas.clientHeight * multiplier) | 0;
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-      // return true;
-    }
-    // return false;
-
-    // webglUtils.resizeCanvasToDisplaySize(gl.canvas);
-
-    // Tell WebGL how to convert from clip space to pixels
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
     // Clear the canvas
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -193,20 +149,10 @@ export class Scene {
     // Bind the attribute/buffer set we want.
     gl.bindVertexArray(vao);
 
-    // Pass in the canvas resolution so we can convert from
-    // pixels to clipspace in the shader
-    gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
-
-    // draw 50 random rectangles in random colors
-    for (var ii = 0; ii < 50; ++ii) {
+    // draw X random rectangles in random colors
+    for (var ii = 0; ii < 2; ++ii) {
       // Put a rectangle in the position buffer
-      this.setRectangle(
-        gl,
-        this.randomInt(300),
-        this.randomInt(300),
-        this.randomInt(300),
-        this.randomInt(300)
-      );
+      this.setRectangle(gl, 0, 0, Math.random(), Math.random());
 
       // Set a random color.
       gl.uniform4f(
