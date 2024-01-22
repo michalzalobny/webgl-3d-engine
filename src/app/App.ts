@@ -80,4 +80,11 @@ export class App {
       this._rafId = null;
     }
   }
+
+  destroy() {
+    this._stopAppFrame();
+    window.removeEventListener("resize", this._onResizeDebounced);
+    window.removeEventListener("visibilitychange", this._onVisibilityChange);
+    this._scene.destroy();
+  }
 }
