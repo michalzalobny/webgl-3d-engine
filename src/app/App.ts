@@ -1,16 +1,18 @@
 import { globalState } from "./utils/globalState";
 import { constants } from "./utils/constants";
 import { debounce } from "./utils/debounce";
+import { Scene } from "./Scene";
 
 export class App {
   _rafId: number | null = null;
   _isResumed = true;
   _lastFrameTime: number | null = null;
 
-  constructor() {
-    this.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  _scene = new Scene();
 
+  constructor() {
     this._onResize();
+    this.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this._addListeners();
     this._resumeAppFrame();
   }
@@ -22,10 +24,14 @@ export class App {
     const stageY = window.innerHeight;
 
     globalState.stageSize.value = [stageX, stageY];
+
+    this._scene.onResize();
   }
 
   setPixelRatio(pixelRatio: number) {
     globalState.pixelRatio.value = pixelRatio;
+
+    this._scene.onPixelRatioChange();
   }
 
   _onVisibilityChange = () => {
@@ -63,6 +69,8 @@ export class App {
     globalState.uTime.value = time * 0.001;
 
     this._lastFrameTime = time;
+
+    this._scene.update();
   };
 
   _stopAppFrame() {
