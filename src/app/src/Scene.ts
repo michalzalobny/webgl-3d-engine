@@ -74,10 +74,9 @@ export class Scene {
 
   render() {
     const gl = this.gl;
-    if (!gl) return;
-    if (!this._shaderProgram) return;
+    if (!gl || !this._shaderProgram) return;
 
-    // Clear the canvas
+    // Clear the canvas and depth buffer
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST);

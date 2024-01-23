@@ -21,10 +21,10 @@ export class ShaderProgram {
     }
 
     this.gl = gl;
-    this.init(this.gl);
+    this._init(this.gl);
   }
 
-  createShader(gl: WebGL2RenderingContext, type: number, source: string) {
+  _createShader(gl: WebGL2RenderingContext, type: number, source: string) {
     const shader = gl.createShader(type);
     if (!shader) throw new Error(`Shader not created for type ${type}`);
     gl.shaderSource(shader, source);
@@ -34,7 +34,7 @@ export class ShaderProgram {
     gl.deleteShader(shader);
   }
 
-  createProgram(
+  _createProgram(
     gl: WebGL2RenderingContext,
     vertexShader: WebGLShader,
     fragmentShader: WebGLShader
@@ -54,22 +54,22 @@ export class ShaderProgram {
     gl.deleteProgram(program);
   }
 
-  init(gl: WebGL2RenderingContext) {
-    const vertexShader = this.createShader(
+  _init(gl: WebGL2RenderingContext) {
+    const vertexShader = this._createShader(
       gl,
       gl.VERTEX_SHADER,
       this.vertexCode
     );
     if (!vertexShader) throw new Error("Could not create vertex shader");
 
-    const fragmentShader = this.createShader(
+    const fragmentShader = this._createShader(
       gl,
       gl.FRAGMENT_SHADER,
       this.fragmentCode
     );
     if (!fragmentShader) throw new Error("Could not create fragment shader");
 
-    const program = this.createProgram(gl, vertexShader, fragmentShader);
+    const program = this._createProgram(gl, vertexShader, fragmentShader);
     if (!program) throw new Error("Could not create program");
     this.program = program;
   }
@@ -87,12 +87,14 @@ export class ShaderProgram {
   }
 
   setUniform1f(name: string, value: number) {
-    let location = this.getUniformLocation(name);
+    const location = this.getUniformLocation(name);
+    if (!location) throw new Error(`Uniform ${name} not found`);
     this.gl.uniform1f(location, value);
   }
 
   setUniform4f(name: string, value: [number, number, number, number]) {
-    let location = this.getUniformLocation(name);
+    const location = this.getUniformLocation(name);
+    if (!location) throw new Error(`Uniform ${name} not found`);
     this.gl.uniform4f(location, value[0], value[1], value[2], value[3]);
   }
 
