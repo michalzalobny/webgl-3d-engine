@@ -1,6 +1,6 @@
-import { deferByFrame } from "./utils/deferByFrame";
-import { globalState } from "./utils/globalState";
-import { App } from "./App";
+import { deferByFrame } from "./src/utils/deferByFrame";
+import { globalState } from "./src/utils/globalState";
+import { App } from "./src/App";
 
 document.addEventListener("DOMContentLoaded", async () => {
   deferByFrame(async () => {

@@ -7,7 +7,7 @@ const isProduction = process.env.NODE_ENV === "production";
 
 // Configuration for your main application
 const mainConfig = {
-  input: "src/app/main.ts",
+  input: "src/app/index.ts",
   output: {
     dir: "dist/js",
     format: "esm",
