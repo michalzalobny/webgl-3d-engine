@@ -21,8 +21,9 @@ export class Scene {
     let h = globalState.stageSize.value[1];
     const ratio = globalState.pixelRatio.value;
 
-    w = Math.round(w * ratio);
-    h = Math.round(h * ratio);
+    // Possibly need to Math.round() w and h here, but will leave for now
+    w = w * ratio;
+    h = h * ratio;
 
     const canvas = globalState.canvasEl;
     if (!canvas || !this.gl) return;
