@@ -12,20 +12,29 @@ export class Scene {
       this.gl = globalState.canvasEl.getContext("webgl2");
     }
     if (!this.gl) throw new Error("WebGL2 not supported");
-    this._setup();
   }
 
   update() {}
 
   onResize() {
-    const width = globalState.stageSize.value[0];
-    const height = globalState.stageSize.value[1];
-    this.gl?.viewport(0, 0, width, height);
+    let w = globalState.stageSize.value[0];
+    let h = globalState.stageSize.value[1];
+    const ratio = globalState.pixelRatio.value;
 
-    updateDebug(globalState.stageSize.value.join(" x "));
+    w = Math.round(w * ratio);
+    h = Math.round(h * ratio);
+
+    const canvas = globalState.canvasEl;
+    if (!canvas || !this.gl) return;
+
+    // Sets only the resolution of the canvas
+    canvas.width = w;
+    canvas.height = h;
+    this.gl.viewport(0, 0, w, h);
+
+    this.render();
+    updateDebug(`Canvas size: ${w}x${h}`);
   }
-
-  onPixelRatioChange() {}
 
   destroy() {}
 
@@ -48,7 +57,7 @@ export class Scene {
     );
   }
 
-  _setup() {
+  render() {
     const gl = this.gl;
 
     if (!gl) return;
@@ -68,7 +77,6 @@ export class Scene {
         return shader;
       }
 
-      console.log(gl.getShaderInfoLog(shader));
       gl.deleteShader(shader);
     }
 
@@ -97,7 +105,6 @@ export class Scene {
         return program;
       }
 
-      console.log(gl.getProgramInfoLog(program));
       gl.deleteProgram(program);
     }
 
@@ -151,8 +158,10 @@ export class Scene {
 
     // draw X random rectangles in random colors
     for (var ii = 0; ii < 2; ++ii) {
+      const x = (Math.random() - 0.5) * 2;
+      const y = (Math.random() - 0.5) * 2;
       // Put a rectangle in the position buffer
-      this.setRectangle(gl, 0, 0, Math.random(), Math.random());
+      this.setRectangle(gl, 0, 0, x, y);
 
       // Set a random color.
       gl.uniform4f(

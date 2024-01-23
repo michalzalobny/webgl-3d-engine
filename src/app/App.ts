@@ -11,28 +11,27 @@ export class App {
   _scene = new Scene();
 
   constructor() {
-    this._onResize();
-    this.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this._setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
     this._addListeners();
     this._resumeAppFrame();
+    this._onResize();
   }
 
   _onResizeDebounced = debounce(() => this._onResize(), 300);
 
   _onResize() {
     if (!globalState.canvasEl) return;
-    const stageX = globalState.canvasEl.clientWidth;
-    const stageY = globalState.canvasEl.clientHeight;
-
+    const bounds = globalState.canvasEl.getBoundingClientRect();
+    const stageX = bounds.width;
+    const stageY = bounds.height;
     globalState.stageSize.value = [stageX, stageY];
 
     this._scene.onResize();
   }
 
-  setPixelRatio(pixelRatio: number) {
+  _setPixelRatio(pixelRatio: number) {
     globalState.pixelRatio.value = pixelRatio;
-
-    this._scene.onPixelRatioChange();
   }
 
   _onVisibilityChange = () => {
