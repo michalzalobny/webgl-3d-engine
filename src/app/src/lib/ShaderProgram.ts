@@ -7,7 +7,7 @@ interface Props {
 export class ShaderProgram {
   vertexCode: string;
   fragmentCode: string;
-  gl: WebGL2RenderingContext | null;
+  gl: WebGL2RenderingContext;
   program: WebGLProgram | null = null;
 
   constructor(props: Props) {
@@ -16,9 +16,12 @@ export class ShaderProgram {
     this.vertexCode = vertexCode;
     this.fragmentCode = fragmentCode;
 
-    this.gl = gl;
+    if (!gl) {
+      throw new Error("No gl context provided to ShaderProgram constructor");
+    }
 
-    this.init();
+    this.gl = gl;
+    this.init(this.gl);
   }
 
   createShader(gl: WebGL2RenderingContext, type: number, source: string) {
@@ -51,10 +54,7 @@ export class ShaderProgram {
     gl.deleteProgram(program);
   }
 
-  init() {
-    const gl = this.gl;
-    if (!gl) return;
-
+  init(gl: WebGL2RenderingContext) {
     const vertexShader = this.createShader(
       gl,
       gl.VERTEX_SHADER,
@@ -71,53 +71,38 @@ export class ShaderProgram {
 
     const program = this.createProgram(gl, vertexShader, fragmentShader);
     if (!program) throw new Error("Could not create program");
-
     this.program = program;
   }
 
   getAttributeLocation(name: string) {
     if (!this.program)
-      throw new Error("Program not initialized, cannot get attribute location");
-
-    if (!this.gl)
-      throw new Error(
-        "WebGL2 context not initialized, cannot get attribute location"
-      );
+      throw new Error("Cannot get attribute location, program not initialized");
     return this.gl.getAttribLocation(this.program, name);
   }
 
   getUniformLocation(name: string) {
     if (!this.program)
-      throw new Error("Program not initialized, cannot get uniform location");
-
-    if (!this.gl)
-      throw new Error(
-        "WebGL2 context not initialized, cannot get uniform location"
-      );
+      throw new Error("Cannot get uniform location, program not initialized");
     return this.gl.getUniformLocation(this.program, name);
   }
 
   setUniform1f(name: string, value: number) {
-    if (!this.gl)
-      throw new Error("WebGL2 context not initialized, cannot set uniform");
     let location = this.getUniformLocation(name);
     this.gl.uniform1f(location, value);
   }
 
   setUniform4f(name: string, value: [number, number, number, number]) {
-    if (!this.gl)
-      throw new Error("WebGL2 context not initialized, cannot set uniform");
     let location = this.getUniformLocation(name);
     this.gl.uniform4f(location, value[0], value[1], value[2], value[3]);
   }
 
   use() {
-    if (!this.gl || !this.program)
-      throw new Error("Cannot use program, WebGL2 context or program not set");
+    if (!this.program)
+      throw new Error("Cannot use program, program is not set");
     this.gl.useProgram(this.program);
   }
 
   destroy() {
-    this.gl?.deleteProgram(this.program);
+    this.gl.deleteProgram(this.program);
   }
 }
