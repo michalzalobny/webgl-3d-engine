@@ -28,13 +28,16 @@ export class Scene {
     const canvas = globalState.canvasEl;
     if (!canvas || !this.gl) return;
 
-    // Sets only the resolution of the canvas
-    canvas.width = w;
-    canvas.height = h;
+    if (canvas.width !== w && canvas.height !== h) {
+      // Sets only the resolution of the canvas
+      canvas.width = w;
+      canvas.height = h;
+    }
+
     this.gl.viewport(0, 0, w, h);
 
     this.render();
-    updateDebug(`Canvas size: ${w}x${h}`);
+    updateDebug(`Canvas size: ${w.toFixed(2)}x${h.toFixed(2)}`);
   }
 
   destroy() {}
