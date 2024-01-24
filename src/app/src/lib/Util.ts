@@ -15,20 +15,18 @@ export const createVertexArrayObject = (props: CreateVertexArrayObject) => {
   const vao = gl.createVertexArray();
   gl.bindVertexArray(vao);
 
-  // Get the location of the program's attribute
+  // Location of the program's attribute
   const location = gl.getAttribLocation(program, name);
-
-  // Sets buffer as the current ARRAY_BUFFER.
+  // Stored in the VAO
+  gl.enableVertexAttribArray(location);
+  // Sets buffer as the current ARRAY_BUFFER. Current vertex buffer object (VBO) for vertex attributes.
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-
-  // It uses the current ARRAY_BUFFER to feed data to the attribute at the location
+  // Uses current ARRAY_BUFFER's buffer data as the source for vertex attributes
   gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
 
-  // Enable the attribute at the location. Data stored in this location will be accessible and fed to the vertex shader when rendering
-  gl.enableVertexAttribArray(location);
-
-  // Unbind the VAO
+  // Unbind the VAO and the buffer
   gl.bindVertexArray(null);
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
   return vao;
 };
@@ -38,15 +36,21 @@ export const setRectangle = (
   x: number,
   y: number,
   width: number,
-  height: number
+  height: number,
+  buffer: WebGLBuffer | null
 ) => {
   const x1 = x;
   const x2 = x + width;
   const y1 = y;
   const y2 = y + height;
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
   gl.bufferData(
     gl.ARRAY_BUFFER,
     new Float32Array([x1, y1, x2, y1, x1, y2, x1, y2, x2, y1, x2, y2]),
     gl.STATIC_DRAW
   );
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
 };

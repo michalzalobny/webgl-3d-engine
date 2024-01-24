@@ -86,7 +86,7 @@ export class Scene {
       const x = (Math.random() - 0.5) * 2;
       const y = (Math.random() - 0.5) * 2;
       // Put a rectangle in the position buffer
-      setRectangle(gl, 0, 0, x, y);
+      setRectangle(gl, 0, 0, x, y, this._positionBuffer);
 
       // Set a random color.
       this._shaderProgram.setUniform4f("u_color", [
