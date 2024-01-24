@@ -6,7 +6,8 @@ interface CreateVertexArrayObject {
   gl: WebGL2RenderingContext;
 }
 
-// Create VAO for a given attribute
+// Create VAO for a given attribute.
+// VAO stores: vertexAttribPointer, enableVertexAttribArray, buffer binding (location -> buffer)
 export const createVertexArrayObject = (props: CreateVertexArrayObject) => {
   const { name, program, buffer, size, gl } = props;
   if (!program) throw new Error("Could not create VAO, no program");
