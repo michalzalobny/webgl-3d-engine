@@ -1,6 +1,6 @@
-# webgl-viewer
+# WebGL2 3D Engine built from scratch
 
-WebGL2 3D Viewer built from scratch. The goal is to build what I have learned from the project where I was building a [3D renderer in C](https://github.com/michalzalobny/3d-renderer-in-c). This time I will use WebGL2 API instead of raw rasterization functions computed on CPU. Guided by [WebGL2 Fundamentals](https://webgl2fundamentals.org/).
+The goal is to build a custom 3D engine without any libraries - just using WebGL2 API and what I have learnt while creating a [3D renderer in C](https://github.com/michalzalobny/3d-renderer-in-c). Guided by [WebGL2 Fundamentals](https://webgl2fundamentals.org/).
 
 ## Performance
 
