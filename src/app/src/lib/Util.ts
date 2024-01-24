@@ -11,15 +11,21 @@ export const createVertexArrayObject = (props: CreateVertexArrayObject) => {
   const { name, program, buffer, size, gl } = props;
   if (!program) throw new Error("Could not create VAO, no program");
 
-  // Create and bind a new VAO
+  // Create VAO and make it current, subsequent calls to bindBuffer, vertexAttribPointer, etc. will be stored in the VAO
   const vao = gl.createVertexArray();
   gl.bindVertexArray(vao);
 
-  // Get attribute location and set up the attribute for the current VAO
+  // Get the location of the program's attribute
   const location = gl.getAttribLocation(program, name);
-  gl.enableVertexAttribArray(location);
+
+  // Sets buffer as the current ARRAY_BUFFER.
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
+  // It uses the current ARRAY_BUFFER to feed data to the attribute at the location
   gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
+
+  // Enable the attribute at the location. Data stored in this location will be accessible and fed to the vertex shader when rendering
+  gl.enableVertexAttribArray(location);
 
   // Unbind the VAO
   gl.bindVertexArray(null);
