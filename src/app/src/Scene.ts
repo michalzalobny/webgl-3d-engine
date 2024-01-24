@@ -11,6 +11,7 @@ export class Scene {
   gl: WebGL2RenderingContext | null = null;
   _shaderProgram: ShaderProgram | null = null;
   _vao: WebGLVertexArrayObject | null = null;
+  _positionBuffer: WebGLBuffer | null = null;
 
   constructor() {
     if (globalState.canvasEl) {
@@ -47,10 +48,6 @@ export class Scene {
     updateDebug(`Canvas size: ${w.toFixed(2)}x${h.toFixed(2)}`);
   }
 
-  destroy() {
-    this._shaderProgram?.destroy();
-  }
-
   _init() {
     if (!this.gl) return;
 
@@ -61,12 +58,12 @@ export class Scene {
     });
 
     // Create a buffer
-    const positionBuffer = this.gl.createBuffer();
+    this._positionBuffer = this.gl.createBuffer();
 
     this._vao = createVertexArrayObject({
       name: "a_position",
       program: this._shaderProgram.program,
-      buffer: positionBuffer,
+      buffer: this._positionBuffer,
       gl: this.gl,
       size: 2,
     });
@@ -105,5 +102,12 @@ export class Scene {
       const count = 6;
       gl.drawArrays(primitiveType, offset, count);
     }
+  }
+
+  destroy() {
+    this._shaderProgram?.destroy();
+
+    this._positionBuffer && this.gl?.deleteBuffer(this._positionBuffer);
+    this._vao && this.gl?.deleteVertexArray(this._vao);
   }
 }
