@@ -19,6 +19,14 @@ export class Scene {
     }
     if (!this.gl) throw new Error("WebGL2 not supported");
     this.init();
+
+    void this.readFile();
+  }
+
+  private async readFile() {
+    const response = await fetch("/public/assets/models/cube/cube.obj");
+    const text = await response.text();
+    console.log(text);
   }
 
   private init() {
