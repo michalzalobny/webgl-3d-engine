@@ -8,18 +8,73 @@ import { ShaderProgram } from "./lib/ShaderProgram";
 import { createVertexArrayObject, setRectangle } from "./lib/Util";
 
 export class Scene {
-  gl: WebGL2RenderingContext | null = null;
-  _shaderProgram: ShaderProgram | null = null;
-  _vao: WebGLVertexArrayObject | null = null;
-  _positionBuffer: WebGLBuffer | null = null;
+  private gl: WebGL2RenderingContext | null = null;
+  private shaderProgram: ShaderProgram | null = null;
+  private vao: WebGLVertexArrayObject | null = null;
+  private positionBuffer: WebGLBuffer | null = null;
 
   constructor() {
     if (globalState.canvasEl) {
       this.gl = globalState.canvasEl.getContext("webgl2");
     }
     if (!this.gl) throw new Error("WebGL2 not supported");
+    this.init();
+  }
 
-    this._init();
+  private init() {
+    if (!this.gl) return;
+
+    this.shaderProgram = new ShaderProgram({
+      gl: this.gl,
+      fragmentCode: fragmentShaderSource,
+      vertexCode: vertexShaderSource,
+    });
+
+    // Create a buffer
+    this.positionBuffer = this.gl.createBuffer();
+
+    this.vao = createVertexArrayObject({
+      name: "a_position",
+      program: this.shaderProgram.program,
+      buffer: this.positionBuffer,
+      gl: this.gl,
+      size: 2,
+    });
+  }
+
+  private render() {
+    const gl = this.gl;
+    if (!gl || !this.shaderProgram) return;
+
+    // Clear the canvas and depth buffer
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);
+
+    this.shaderProgram.use();
+    gl.bindVertexArray(this.vao);
+
+    // draw X random rectangles in random colors
+    for (let ii = 0; ii < 2; ++ii) {
+      const x = (Math.random() - 0.5) * 2;
+      const y = (Math.random() - 0.5) * 2;
+      // Put a rectangle in the position buffer
+      setRectangle(gl, 0, 0, x, y, this.positionBuffer);
+
+      // Set a random color.
+      this.shaderProgram.setUniform4f("u_color", [
+        Math.random(),
+        Math.random(),
+        Math.random(),
+        1,
+      ]);
+
+      // Draw the rectangle.
+      const primitiveType = gl.TRIANGLES;
+      const offset = 0;
+      const count = 6;
+      gl.drawArrays(primitiveType, offset, count);
+    }
   }
 
   update() {}
@@ -48,66 +103,10 @@ export class Scene {
     updateDebug(`Canvas size: ${w.toFixed(2)}x${h.toFixed(2)}`);
   }
 
-  _init() {
-    if (!this.gl) return;
-
-    this._shaderProgram = new ShaderProgram({
-      gl: this.gl,
-      fragmentCode: fragmentShaderSource,
-      vertexCode: vertexShaderSource,
-    });
-
-    // Create a buffer
-    this._positionBuffer = this.gl.createBuffer();
-
-    this._vao = createVertexArrayObject({
-      name: "a_position",
-      program: this._shaderProgram.program,
-      buffer: this._positionBuffer,
-      gl: this.gl,
-      size: 2,
-    });
-  }
-
-  render() {
-    const gl = this.gl;
-    if (!gl || !this._shaderProgram) return;
-
-    // Clear the canvas and depth buffer
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.enable(gl.DEPTH_TEST);
-
-    this._shaderProgram.use();
-    gl.bindVertexArray(this._vao);
-
-    // draw X random rectangles in random colors
-    for (let ii = 0; ii < 2; ++ii) {
-      const x = (Math.random() - 0.5) * 2;
-      const y = (Math.random() - 0.5) * 2;
-      // Put a rectangle in the position buffer
-      setRectangle(gl, 0, 0, x, y, this._positionBuffer);
-
-      // Set a random color.
-      this._shaderProgram.setUniform4f("u_color", [
-        Math.random(),
-        Math.random(),
-        Math.random(),
-        1,
-      ]);
-
-      // Draw the rectangle.
-      const primitiveType = gl.TRIANGLES;
-      const offset = 0;
-      const count = 6;
-      gl.drawArrays(primitiveType, offset, count);
-    }
-  }
-
   destroy() {
-    this._shaderProgram?.destroy();
+    this.shaderProgram?.destroy();
 
-    this._positionBuffer && this.gl?.deleteBuffer(this._positionBuffer);
-    this._vao && this.gl?.deleteVertexArray(this._vao);
+    this.positionBuffer && this.gl?.deleteBuffer(this.positionBuffer);
+    this.vao && this.gl?.deleteVertexArray(this.vao);
   }
 }

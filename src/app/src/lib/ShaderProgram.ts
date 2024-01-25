@@ -5,9 +5,9 @@ interface Props {
 }
 
 export class ShaderProgram {
-  vertexCode: string;
-  fragmentCode: string;
-  gl: WebGL2RenderingContext;
+  private vertexCode: string;
+  private fragmentCode: string;
+  private gl: WebGL2RenderingContext;
   program: WebGLProgram | null = null;
 
   constructor(props: Props) {
@@ -21,10 +21,14 @@ export class ShaderProgram {
     }
 
     this.gl = gl;
-    this._init(this.gl);
+    this.init(this.gl);
   }
 
-  _createShader(gl: WebGL2RenderingContext, type: number, source: string) {
+  private createShader(
+    gl: WebGL2RenderingContext,
+    type: number,
+    source: string
+  ) {
     const shader = gl.createShader(type);
     if (!shader) throw new Error(`Shader not created for type ${type}`);
     gl.shaderSource(shader, source);
@@ -34,7 +38,7 @@ export class ShaderProgram {
     gl.deleteShader(shader);
   }
 
-  _createProgram(
+  private createProgram(
     gl: WebGL2RenderingContext,
     vertexShader: WebGLShader,
     fragmentShader: WebGLShader
@@ -54,22 +58,22 @@ export class ShaderProgram {
     gl.deleteProgram(program);
   }
 
-  _init(gl: WebGL2RenderingContext) {
-    const vertexShader = this._createShader(
+  private init(gl: WebGL2RenderingContext) {
+    const vertexShader = this.createShader(
       gl,
       gl.VERTEX_SHADER,
       this.vertexCode
     );
     if (!vertexShader) throw new Error("Could not create vertex shader");
 
-    const fragmentShader = this._createShader(
+    const fragmentShader = this.createShader(
       gl,
       gl.FRAGMENT_SHADER,
       this.fragmentCode
     );
     if (!fragmentShader) throw new Error("Could not create fragment shader");
 
-    const program = this._createProgram(gl, vertexShader, fragmentShader);
+    const program = this.createProgram(gl, vertexShader, fragmentShader);
     if (!program) throw new Error("Could not create program");
     this.program = program;
   }
