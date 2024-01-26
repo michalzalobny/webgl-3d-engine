@@ -5,41 +5,30 @@ import fragmentShaderSource from "./shaders/default/fragment.glsl";
 import vertexShaderSource from "./shaders/default/vertex.glsl";
 
 import { ShaderProgram } from "./lib/ShaderProgram";
-import { createVertexArrayObject, setRectangle } from "./lib/Util";
-// import { parseOBJ } from "./lib/parseOBJ";
+import { Mesh } from "./lib/Mesh";
 import { parseOBJ } from "./lib/parseOBJ";
 
 export class Scene {
   private gl: WebGL2RenderingContext | null = null;
+
+  private mesh: Mesh | null = null;
   private shaderProgram: ShaderProgram | null = null;
-  private vao: WebGLVertexArrayObject | null = null;
-  private positionBuffer: WebGLBuffer | null = null;
 
   constructor() {
     if (globalState.canvasEl) {
       this.gl = globalState.canvasEl.getContext("webgl2");
     }
     if (!this.gl) throw new Error("WebGL2 not supported");
-    this.init();
 
-    void this.readFile();
+    void this.init();
   }
 
-  private async readFile() {
+  private async init() {
+    if (!this.gl) return;
+
     const response = await fetch("/public/assets/models/cube/cube.obj");
     const text = await response.text();
-
-    // const { geometries, materialLibs } = parseOBJ(text);
-
-    // console.log(geometries);
-    // console.log(materialLibs);
-    // parseOBJ(text);
-
-    const obj1Data = parseOBJ(text);
-  }
-
-  private init() {
-    if (!this.gl) return;
+    const objData = parseOBJ(text);
 
     this.shaderProgram = new ShaderProgram({
       gl: this.gl,
@@ -47,15 +36,12 @@ export class Scene {
       vertexCode: vertexShaderSource,
     });
 
-    // Create a buffer
-    this.positionBuffer = this.gl.createBuffer();
-
-    this.vao = createVertexArrayObject({
-      name: "a_position",
-      program: this.shaderProgram.program,
-      buffer: this.positionBuffer,
+    this.mesh = new Mesh({
       gl: this.gl,
-      size: 2,
+      shaderProgram: this.shaderProgram,
+      vertices: objData.vertices,
+      normals: objData.normals,
+      texcoords: objData.texcoords,
     });
   }
 
@@ -68,33 +54,12 @@ export class Scene {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST);
 
-    this.shaderProgram.use();
-    gl.bindVertexArray(this.vao);
-
-    // draw X random rectangles in random colors
-    for (let ii = 0; ii < 2; ++ii) {
-      const x = (Math.random() - 0.5) * 2;
-      const y = (Math.random() - 0.5) * 2;
-      // Put a rectangle in the position buffer
-      setRectangle(gl, 0, 0, x, y, this.positionBuffer);
-
-      // Set a random color.
-      this.shaderProgram.setUniform4f("u_color", [
-        Math.random(),
-        Math.random(),
-        Math.random(),
-        1,
-      ]);
-
-      // Draw the rectangle.
-      const primitiveType = gl.TRIANGLES;
-      const offset = 0;
-      const count = 6;
-      gl.drawArrays(primitiveType, offset, count);
-    }
+    this.mesh?.render();
   }
 
-  update() {}
+  update() {
+    this.render();
+  }
 
   onResize() {
     let w = globalState.stageSize.value[0];
@@ -116,14 +81,12 @@ export class Scene {
 
     this.gl.viewport(0, 0, w, h);
 
-    this.render();
     updateDebug(`Canvas size: ${w.toFixed(2)}x${h.toFixed(2)}`);
   }
 
   destroy() {
     this.shaderProgram?.destroy();
 
-    this.positionBuffer && this.gl?.deleteBuffer(this.positionBuffer);
-    this.vao && this.gl?.deleteVertexArray(this.vao);
+    this.mesh?.destroy();
   }
 }
