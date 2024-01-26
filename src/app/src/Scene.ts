@@ -6,6 +6,7 @@ import vertexShaderSource from "./shaders/default/vertex.glsl";
 
 import { ShaderProgram } from "./lib/ShaderProgram";
 import { createVertexArrayObject, setRectangle } from "./lib/Util";
+// import { parseOBJ } from "./lib/parseOBJ";
 import { parseOBJ } from "./lib/parseOBJ";
 
 export class Scene {
@@ -28,10 +29,13 @@ export class Scene {
     const response = await fetch("/public/assets/models/cube/cube.obj");
     const text = await response.text();
 
-    const { geometries, materialLibs } = parseOBJ(text);
+    // const { geometries, materialLibs } = parseOBJ(text);
 
-    console.log(geometries);
-    console.log(materialLibs);
+    // console.log(geometries);
+    // console.log(materialLibs);
+    // parseOBJ(text);
+
+    const obj1Data = parseOBJ(text);
   }
 
   private init() {

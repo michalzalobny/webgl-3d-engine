@@ -1,138 +1,82 @@
 export const parseOBJ = (text: string) => {
-  // because indices are base 1 let's just fill in the 0th data
-  const objPositions = [[0, 0, 0]];
-  const objTexcoords = [[0, 0]];
-  const objNormals = [[0, 0, 0]];
+  const vertices_lookup: number[][] = [];
+  const normals_lookup: number[][] = [];
+  const texcoords_lookup: number[][] = [];
 
-  // same order as `f` indices
-  const objVertexData = [objPositions, objTexcoords, objNormals];
+  const finalVertices: number[][] = [];
+  const finalNormals: number[][] = [];
+  const finalTexcoords: number[][] = [];
 
-  // same order as `f` indices
-  let webglVertexData = [
-    [], // positions
-    [], // texcoords
-    [], // normals
-  ];
-
-  const materialLibs = [];
-  const geometries = [];
-  let geometry;
-  let groups = ["default"];
-  let material = "default";
-  let object = "default";
-
-  const noop = () => {};
-
-  function newGeometry() {
-    // If there is an existing geometry and it's
-    // not empty then start a new one.
-    if (geometry && geometry.data.position.length) {
-      geometry = undefined;
-    }
-  }
-
-  function setGeometry() {
-    if (!geometry) {
-      const position = [];
-      const texcoord = [];
-      const normal = [];
-      webglVertexData = [position, texcoord, normal];
-      geometry = {
-        object,
-        groups,
-        material,
-        data: {
-          position,
-          texcoord,
-          normal,
-        },
-      };
-      geometries.push(geometry);
-    }
-  }
-
-  function addVertex(vert) {
-    const ptn = vert.split("/");
-    ptn.forEach((objIndexStr, i) => {
-      if (!objIndexStr) {
-        return;
-      }
-      const objIndex = parseInt(objIndexStr);
-      const index = objIndex + (objIndex >= 0 ? 0 : objVertexData[i].length);
-      webglVertexData[i].push(...objVertexData[i][index]);
-    });
-  }
-
-  const keywords = {
-    v(parts) {
-      objPositions.push(parts.map(parseFloat));
-    },
-    vn(parts) {
-      objNormals.push(parts.map(parseFloat));
-    },
-    vt(parts) {
-      // should check for missing v and extra w?
-      objTexcoords.push(parts.map(parseFloat));
-    },
-    f(parts) {
-      setGeometry();
-      const numTriangles = parts.length - 2;
-      for (let tri = 0; tri < numTriangles; ++tri) {
-        addVertex(parts[0]);
-        addVertex(parts[tri + 1]);
-        addVertex(parts[tri + 2]);
-      }
-    },
-    s: noop, // smoothing group
-    mtllib(parts, unparsedArgs) {
-      // the spec says there can be multiple filenames here
-      // but many exist with spaces in a single filename
-      materialLibs.push(unparsedArgs);
-    },
-    usemtl(parts, unparsedArgs) {
-      material = unparsedArgs;
-      newGeometry();
-    },
-    g(parts) {
-      groups = parts;
-      newGeometry();
-    },
-    o(parts, unparsedArgs) {
-      object = unparsedArgs;
-      newGeometry();
-    },
-  };
-
-  const keywordRE = /(\w*)(?: )*(.*)/;
   const lines = text.split("\n");
+
   for (let lineNo = 0; lineNo < lines.length; ++lineNo) {
+    // Remove whitespace from both sides of a string
     const line = lines[lineNo].trim();
+
+    // Skip comments and empty lines
     if (line === "" || line.startsWith("#")) {
       continue;
     }
-    const m = keywordRE.exec(line);
-    if (!m) {
-      continue;
-    }
-    const [, keyword, unparsedArgs] = m;
-    const parts = line.split(/\s+/).slice(1);
-    const handler = keywords[keyword];
-    if (!handler) {
-      console.warn("unhandled keyword:", keyword); // eslint-disable-line no-console
-      continue;
-    }
-    handler(parts, unparsedArgs);
-  }
 
-  // remove any arrays that have no entries.
-  for (const geometry of geometries) {
-    geometry.data = Object.fromEntries(
-      Object.entries(geometry.data).filter(([, array]) => array.length > 0)
-    );
+    // Split a string into an array of substrings - after each space or tab
+    const lineParts = line.split(/\s+/);
+    const keyword = lineParts[0];
+
+    // Load vertices_lookup
+    if (keyword === "v") {
+      const x = parseFloat(lineParts[1]);
+      const y = parseFloat(lineParts[2]);
+      const z = parseFloat(lineParts[3]);
+      vertices_lookup.push([x, y, z]);
+    }
+
+    // Load normals_lookup
+    if (keyword === "vn") {
+      const x = parseFloat(lineParts[1]);
+      const y = parseFloat(lineParts[2]);
+      const z = parseFloat(lineParts[3]);
+      normals_lookup.push([x, y, z]);
+    }
+
+    // Load texture coordinates lookup
+    if (keyword === "vt") {
+      const u = parseFloat(lineParts[1]);
+      const v = parseFloat(lineParts[2]);
+      texcoords_lookup.push([u, v]);
+    }
+
+    // Load face data. It's in the format of "f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3"
+    if (keyword === "f") {
+      const faceVertices: number[][] = [];
+      const faceNormals: number[][] = [];
+      const faceTexcoords: number[][] = [];
+
+      for (let i = 1; i < lineParts.length; ++i) {
+        const facePart = lineParts[i].split("/");
+
+        const vertexIndex = parseInt(facePart[0]);
+        const vertex = vertices_lookup[vertexIndex - 1];
+        faceVertices.push(vertex);
+
+        const texcoordIndex = parseInt(facePart[1]);
+        const texcoord = texcoords_lookup[texcoordIndex - 1];
+        faceTexcoords.push(texcoord);
+
+        const normalIndex = parseInt(facePart[2]);
+        const normal = normals_lookup[normalIndex - 1];
+        faceNormals.push(normal);
+      }
+
+      // Add vertices, normals and texture coordinates to the final arrays
+      finalVertices.push(...faceVertices);
+      finalNormals.push(...faceNormals);
+      finalTexcoords.push(...faceTexcoords);
+    }
   }
 
   return {
-    geometries,
-    materialLibs,
+    vertices: finalVertices.flat(),
+    normals: finalNormals.flat(),
+    texcoords: finalTexcoords.flat(),
   };
 };
