@@ -74,6 +74,9 @@ export class Scene {
   onResize() {
     let w = globalState.stageSize.value[0];
     let h = globalState.stageSize.value[1];
+
+    updateDebug(`Window size: ${w.toFixed(1)} X ${h.toFixed(1)}`);
+
     const ratio = globalState.pixelRatio.value;
 
     // Possibly need to Math.round() w and h here, but will leave for now
@@ -90,10 +93,6 @@ export class Scene {
     }
 
     this.gl.viewport(0, 0, w, h);
-
-    updateDebug(
-      `Canvas size: ${(w / ratio).toFixed(1)} x ${(h / ratio).toFixed(1)}`
-    );
 
     this.camera.updateProjectionMatrix({
       fov: Math.PI / 3,
