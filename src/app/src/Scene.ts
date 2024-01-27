@@ -8,6 +8,8 @@ import { ShaderProgram } from "./lib/ShaderProgram";
 import { Mesh } from "./lib/Mesh";
 import { parseOBJ } from "./lib/parseOBJ";
 import { Camera } from "./lib/Camera";
+import { lerp } from "./utils/lerp";
+import { vec3 } from "gl-matrix";
 
 export class Scene {
   private gl: WebGL2RenderingContext | null = null;
@@ -57,13 +59,27 @@ export class Scene {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST);
 
-    this.mesh?.render({
-      camera: this.camera,
+    // Lerp mouse position
+    const mouse2DTarget = globalState.mouse2DTarget.value;
+    const mouse2DCurrent = globalState.mouse2DCurrent.value;
+    mouse2DCurrent[0] = lerp(mouse2DCurrent[0], mouse2DTarget[0], 0.03);
+    mouse2DCurrent[1] = lerp(mouse2DCurrent[1], mouse2DTarget[1], 0.03);
+
+    this.camera.updateViewMatrix({
+      eye: [-mouse2DCurrent[0] * 0.5, -mouse2DCurrent[1] * 0.1, 0.5],
     });
+
     if (this.mesh) {
-      this.mesh.position[0] = Math.sin(globalState.uTime.value * 2.0) * 0.1;
-      this.mesh.rotation[1] += 0.01 * globalState.slowDownFactor.value;
       this.mesh.rotation[2] += 0.01 * globalState.slowDownFactor.value;
+      this.mesh.rotation[0] += 0.02 * globalState.slowDownFactor.value;
+
+      this.mesh.scale = vec3.fromValues(
+        mouse2DCurrent[1] * 1 + 1.2,
+        mouse2DCurrent[1] * 1 + 1.2,
+        mouse2DCurrent[1] * 1 + 1.2
+      );
+
+      this.mesh.render({ camera: this.camera });
     }
   }
 

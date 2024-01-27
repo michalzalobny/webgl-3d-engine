@@ -8,9 +8,9 @@ interface MakeProjectionMatrix {
 }
 
 interface MakeLookAtMatrix {
-  eye: vec3;
-  target: vec3;
-  up: vec3;
+  eye?: vec3;
+  target?: vec3;
+  up?: vec3;
 }
 
 export class Camera {
@@ -82,7 +82,7 @@ export class Camera {
   }
 
   private makeLookAtMatrix(props: MakeLookAtMatrix) {
-    const { eye, target, up } = props;
+    const { eye = this.position, target = this.target, up = this.up } = props;
 
     // LookAt matrix: https://www.songho.ca/opengl/gl_camera.html
     const forward = vec3.create();
@@ -126,7 +126,7 @@ export class Camera {
     this.orthoProjectionMatrix = this.makeOrthoProjMatrix(props);
   }
 
-  updateViewMatrix({ eye, target, up = this.up }: MakeLookAtMatrix) {
+  updateViewMatrix({ eye, target, up }: MakeLookAtMatrix) {
     this.viewMatrix = this.makeLookAtMatrix({ eye, target, up });
   }
 }

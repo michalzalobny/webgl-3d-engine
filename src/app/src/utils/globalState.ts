@@ -13,6 +13,12 @@ export const globalState = {
   uTime: {
     value: 0,
   },
+  mouse2DTarget: {
+    value: [0, 0],
+  },
+  mouse2DCurrent: {
+    value: [0, 0],
+  },
   app: null as App | null,
   debugHolderEl: null as HTMLDivElement | null,
   canvasEl: null as HTMLCanvasElement | null,
