@@ -2,6 +2,8 @@
 
 The goal is to build a custom 3D engine without any libraries - just using WebGL2 API and what I have learnt while creating a [3D renderer in C](https://github.com/michalzalobny/3d-renderer-in-c). Guided by [WebGL2 Fundamentals](https://webgl2fundamentals.org/).
 
+I'm using here Right-Handed Coordinate System (positive Z axis points out of the screen). I'm also using column-major matrices layout.
+
 ## Performance
 
 - Application without any WebGL2 context scores 4x 100% on lighthouse, with 0ms of Total Blocking Time, 0.8s First and Largest Contentful Paint. Speed index is 0.8s.
