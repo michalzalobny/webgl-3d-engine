@@ -1,5 +1,4 @@
 import { mat4, vec3 } from "gl-matrix";
-import { printMat4 } from "../utils/printMat4";
 
 interface MakeProjectionMatrix {
   fov: number;
@@ -29,8 +28,6 @@ export class Camera {
       target: this.target,
       up: this.up,
     });
-
-    printMat4(this.viewMatrix);
   }
 
   private makePerspectiveProjMatrix(props: MakeProjectionMatrix) {
