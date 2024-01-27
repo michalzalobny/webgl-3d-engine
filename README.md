@@ -2,7 +2,7 @@
 
 The goal is to build a custom 3D engine without any libraries - just using WebGL2 API and what I have learnt while creating a [3D renderer in C](https://github.com/michalzalobny/3d-renderer-in-c). Guided by [WebGL2 Fundamentals](https://webgl2fundamentals.org/).
 
-I'm using here Right-Handed Coordinate System (positive Z axis points out of the screen). I'm also using column-major matrices layout.
+I'm using here Right-Handed Coordinate System (positive Z axis points out of the screen). I'm also using column-major matrices layout - so I will be using post-multiplication -> `M * v` to transform a vector `v` by a matrix `M`.
 
 ## Performance
 
