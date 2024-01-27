@@ -29,7 +29,7 @@ export class Scene {
   private async init() {
     if (!this.gl) return;
 
-    const response = await fetch("/public/assets/models/cube/cube.obj");
+    const response = await fetch("/public/assets/models/f22/f22.obj");
     const text = await response.text();
     const objData = parseOBJ(text);
 
