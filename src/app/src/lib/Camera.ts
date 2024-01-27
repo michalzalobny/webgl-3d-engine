@@ -1,4 +1,5 @@
-import { mat4 } from "gl-matrix";
+import { mat4, vec3 } from "gl-matrix";
+import { printMat4 } from "../utils/printMat4";
 
 interface MakeProjectionMatrix {
   fov: number;
@@ -7,13 +8,29 @@ interface MakeProjectionMatrix {
   far: number;
 }
 
+interface MakeLookAtMatrix {
+  eye: vec3;
+  target: vec3;
+  up: vec3;
+}
+
 export class Camera {
-  perspectiveProjectionMatrix;
-  orthoProjectionMatrix;
+  perspectiveProjectionMatrix = mat4.create();
+  orthoProjectionMatrix = mat4.create();
+  viewMatrix = mat4.create();
+
+  private position = vec3.fromValues(0, 0, 0.5);
+  private target = vec3.fromValues(0, 0, -1);
+  private up = vec3.fromValues(0, 1, 0);
 
   constructor() {
-    this.perspectiveProjectionMatrix = mat4.create();
-    this.orthoProjectionMatrix = mat4.create();
+    this.viewMatrix = this.makeLookAtMatrix({
+      eye: this.position,
+      target: this.target,
+      up: this.up,
+    });
+
+    printMat4(this.viewMatrix);
   }
 
   private makePerspectiveProjMatrix(props: MakeProjectionMatrix) {
@@ -67,8 +84,52 @@ export class Camera {
     return out;
   }
 
+  private makeLookAtMatrix(props: MakeLookAtMatrix) {
+    const { eye, target, up } = props;
+
+    // LookAt matrix: https://www.songho.ca/opengl/gl_camera.html
+    const forward = vec3.create();
+    vec3.subtract(forward, eye, target);
+    vec3.normalize(forward, forward);
+
+    const left = vec3.create();
+    vec3.cross(left, up, forward);
+    vec3.normalize(left, left);
+
+    const newUp = vec3.create();
+    vec3.cross(newUp, forward, left);
+
+    const out = mat4.create();
+
+    out[0] = left[0];
+    out[1] = newUp[0];
+    out[2] = forward[0];
+    out[3] = 0;
+
+    out[4] = left[1];
+    out[5] = newUp[1];
+    out[6] = forward[1];
+    out[7] = 0;
+
+    out[8] = left[2];
+    out[9] = newUp[2];
+    out[10] = forward[2];
+    out[11] = 0;
+
+    out[12] = -left[0] * eye[0] - left[1] * eye[1] - left[2] * eye[2];
+    out[13] = -newUp[0] * eye[0] - newUp[1] * eye[1] - newUp[2] * eye[2];
+    out[14] = -forward[0] * eye[0] - forward[1] * eye[1] - forward[2] * eye[2];
+    out[15] = 1;
+
+    return out;
+  }
+
   updateProjectionMatrix(props: MakeProjectionMatrix) {
     this.perspectiveProjectionMatrix = this.makePerspectiveProjMatrix(props);
     this.orthoProjectionMatrix = this.makeOrthoProjMatrix(props);
+  }
+
+  updateViewMatrix({ eye, target, up = this.up }: MakeLookAtMatrix) {
+    this.viewMatrix = this.makeLookAtMatrix({ eye, target, up });
   }
 }
