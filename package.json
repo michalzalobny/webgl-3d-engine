@@ -26,6 +26,7 @@
     "concurrently": "8.2.0",
     "dotenv": "16.3.1",
     "fs-extra": "11.1.1",
+    "gl-matrix": "^3.4.3",
     "glob": "10.3.3",
     "glsl-noise": "0.0.0",
     "glslify": "7.1.1",

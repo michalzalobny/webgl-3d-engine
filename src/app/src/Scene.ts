@@ -7,9 +7,12 @@ import vertexShaderSource from "./shaders/default/vertex.glsl";
 import { ShaderProgram } from "./lib/ShaderProgram";
 import { Mesh } from "./lib/Mesh";
 import { parseOBJ } from "./lib/parseOBJ";
+import { Camera } from "./lib/Camera";
 
 export class Scene {
   private gl: WebGL2RenderingContext | null = null;
+
+  private camera = new Camera();
 
   private mesh: Mesh | null = null;
   private shaderProgram: ShaderProgram | null = null;
@@ -54,7 +57,14 @@ export class Scene {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST);
 
-    this.mesh?.render();
+    this.mesh?.render({
+      camera: this.camera,
+    });
+    if (this.mesh) {
+      this.mesh.position[0] = Math.sin(globalState.uTime.value * 2.0) * 0.1;
+      this.mesh.rotation[1] += 0.01 * globalState.slowDownFactor.value;
+      this.mesh.rotation[2] += 0.01 * globalState.slowDownFactor.value;
+    }
   }
 
   update() {
@@ -81,7 +91,16 @@ export class Scene {
 
     this.gl.viewport(0, 0, w, h);
 
-    updateDebug(`Canvas size: ${w.toFixed(2)}x${h.toFixed(2)}`);
+    updateDebug(
+      `Canvas size: ${(w / ratio).toFixed(1)} x ${(h / ratio).toFixed(1)}`
+    );
+
+    this.camera.updateProjectionMatrix({
+      fov: Math.PI / 3,
+      aspect_ratio: w / h,
+      near: 0.1,
+      far: 20,
+    });
   }
 
   destroy() {

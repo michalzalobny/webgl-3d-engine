@@ -4,11 +4,14 @@ in vec3 a_position;
 in vec3 a_normal;
 in vec2 a_uv;
 
+uniform mat4 u_projectionMatrix;
+uniform mat4 u_modelViewMatrix;
+
+
 out vec2 v_uv;
 
-// all shaders have a main function
-void main() {
-    gl_Position = vec4(a_position, 1.0);
 
+void main() {
+    gl_Position =  u_projectionMatrix * u_modelViewMatrix * vec4(a_position, 1.0);
     v_uv = a_uv;
 }

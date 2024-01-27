@@ -1,5 +1,8 @@
+import { mat4, vec3 } from "gl-matrix";
+
 import { ShaderProgram } from "./ShaderProgram";
 import { createAndInitBuffer, setupVertexAttribute } from "./Util";
+import { Camera } from "./Camera";
 
 interface Constructor {
   vertices: number[];
@@ -7,6 +10,10 @@ interface Constructor {
   texcoords: number[];
   shaderProgram: ShaderProgram;
   gl: WebGL2RenderingContext;
+}
+
+interface Render {
+  camera: Camera;
 }
 
 export class Mesh {
@@ -21,14 +28,22 @@ export class Mesh {
   private normalBuffer: WebGLBuffer | null = null;
   private uvBuffer: WebGLBuffer | null = null;
 
+  private modelMatrix = mat4.create();
+
+  position = vec3.fromValues(0, 0, 0);
+  scale = vec3.fromValues(1, 1, 1);
+  rotation = vec3.fromValues(0, 0, 0);
+
   constructor(props: Constructor) {
     const { gl, shaderProgram, vertices, normals, texcoords } = props;
 
     this.gl = gl;
     this.shaderProgram = shaderProgram;
-    this.vertices = vertices;
+    this.vertices = vertices.map((n) => n * 0.04);
     this.normals = normals;
     this.texcoords = texcoords;
+
+    this.position = vec3.fromValues(0, 0, -0.4);
 
     this.init();
   }
@@ -87,12 +102,33 @@ export class Mesh {
     this.gl.bindVertexArray(null);
   }
 
-  render() {
+  render(props: Render) {
+    const { camera } = props;
+
     this.shaderProgram.use();
     this.gl.bindVertexArray(this.VAO);
 
+    // Construct model matrix
+    mat4.identity(this.modelMatrix);
+    mat4.translate(this.modelMatrix, this.modelMatrix, this.position);
+    mat4.scale(this.modelMatrix, this.modelMatrix, this.scale);
+    mat4.rotateX(this.modelMatrix, this.modelMatrix, this.rotation[0]);
+    mat4.rotateY(this.modelMatrix, this.modelMatrix, this.rotation[1]);
+    mat4.rotateZ(this.modelMatrix, this.modelMatrix, this.rotation[2]);
+
+    this.shaderProgram.setUniformMatrix4fv(
+      "u_projectionMatrix",
+      new Float32Array(camera.perspectiveProjectionMatrix)
+    );
+    this.shaderProgram.setUniformMatrix4fv(
+      "u_modelViewMatrix",
+      new Float32Array(this.modelMatrix)
+    );
+
     const drawMode = this.gl.TRIANGLES;
     this.gl.drawArrays(drawMode, 0, this.vertices.length / 3);
+
+    this.gl.bindVertexArray(null);
   }
 
   destroy() {
