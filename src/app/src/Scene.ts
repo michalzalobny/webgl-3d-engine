@@ -13,8 +13,12 @@ import { GeometriesManager } from "./lib/GeometriesManager";
 export class Scene {
   private gl: WebGL2RenderingContext | null = null;
   private camera = new Camera();
+
   private mesh: Mesh | null = null;
+  private mesh2: Mesh | null = null;
   private shaderProgram: ShaderProgram | null = null;
+  private shaderProgram2: ShaderProgram | null = null;
+
   private texturesManager;
   private geometriesManager = new GeometriesManager();
 
@@ -59,7 +63,27 @@ export class Scene {
           uniformName: "u_image",
         },
         {
+          textureSrc: "/public/assets/models/crab/crab.png",
+          uniformName: "u_image2",
+        },
+      ],
+      uniforms: {
+        u_time: globalState.uTime,
+      },
+    });
+
+    this.shaderProgram2 = new ShaderProgram({
+      gl: this.gl,
+      fragmentCode: fragmentShaderSource,
+      vertexCode: vertexShaderSource,
+      texturesManager: this.texturesManager,
+      texturesToUse: [
+        {
           textureSrc: "/public/assets/models/f22/f22.png",
+          uniformName: "u_image",
+        },
+        {
+          textureSrc: "/public/assets/models/efa/efa.png",
           uniformName: "u_image2",
         },
       ],
@@ -73,6 +97,14 @@ export class Scene {
       shaderProgram: this.shaderProgram,
       geometry: this.geometriesManager.getGeometry(
         "/public/assets/models/crab/crab.obj"
+      ),
+    });
+
+    this.mesh2 = new Mesh({
+      gl: this.gl,
+      shaderProgram: this.shaderProgram2,
+      geometry: this.geometriesManager.getGeometry(
+        "/public/assets/models/f22/f22.obj"
       ),
     });
   }
@@ -116,6 +148,25 @@ export class Scene {
 
       this.mesh.render({ camera: this.camera });
     }
+
+    if (this.mesh2) {
+      this.mesh2.rotation[2] -= 0.005 * globalState.slowDownFactor.value;
+      this.mesh2.rotation[0] -= 0.01 * globalState.slowDownFactor.value;
+
+      this.mesh2.scale = vec3.fromValues(
+        mouse2DCurrent[1] * 1 + 1.2,
+        mouse2DCurrent[1] * 1 + 1.2,
+        mouse2DCurrent[1] * 1 + 1.2
+      );
+
+      this.mesh2.position = vec3.fromValues(
+        mouse2DCurrent[0] * 0.5,
+        mouse2DCurrent[1] * 0.1,
+        0
+      );
+
+      this.mesh2.render({ camera: this.camera });
+    }
   }
 
   update() {
@@ -157,5 +208,6 @@ export class Scene {
     this.shaderProgram?.destroy();
 
     this.mesh?.destroy();
+    this.mesh2?.destroy();
   }
 }
