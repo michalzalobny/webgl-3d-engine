@@ -124,12 +124,12 @@ export class Mesh {
 
     this.shaderProgram.setUniformMatrix4fv(
       "u_modelViewMatrix",
-      new Float32Array(this.modelViewMatrix)
+      this.modelViewMatrix
     );
 
     this.shaderProgram.setUniformMatrix4fv(
       "u_projectionMatrix",
-      new Float32Array(camera.perspectiveProjectionMatrix)
+      camera.perspectiveProjectionMatrix
     );
 
     const drawMode = this.gl.TRIANGLES;

@@ -139,7 +139,7 @@ export class ShaderProgram {
     this.gl.uniform4f(location, value[0], value[1], value[2], value[3]);
   }
 
-  setUniformMatrix4fv(name: string, value: Float32Array) {
+  setUniformMatrix4fv(name: string, value: Float32Array | number[]) {
     const location = this.getUniformLocation(name);
     if (!location) throw new Error(`Uniform ${name} not found`);
     this.gl.uniformMatrix4fv(location, false, value);
