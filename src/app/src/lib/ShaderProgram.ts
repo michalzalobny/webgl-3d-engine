@@ -120,7 +120,9 @@ export class ShaderProgram {
     // If uniform location is not cached, get it from the GPU
     if (!this.uniformLocations.has(name)) {
       const location = this.gl.getUniformLocation(this.program, name);
-      if (!location) throw new Error(`Uniform ${name} not found`);
+      if (!location) {
+        return undefined;
+      }
       this.uniformLocations.set(name, location);
     }
     const cachedLocation = this.uniformLocations.get(name);
@@ -129,19 +131,25 @@ export class ShaderProgram {
 
   setUniform1f(name: string, value: number) {
     const location = this.getUniformLocation(name);
-    if (!location) throw new Error(`Uniform ${name} not found`);
+    if (!location) {
+      return undefined;
+    }
     this.gl.uniform1f(location, value);
   }
 
   setUniform4f(name: string, value: [number, number, number, number]) {
     const location = this.getUniformLocation(name);
-    if (!location) throw new Error(`Uniform ${name} not found`);
+    if (!location) {
+      return undefined;
+    }
     this.gl.uniform4f(location, value[0], value[1], value[2], value[3]);
   }
 
   setUniformMatrix4fv(name: string, value: Float32Array | number[]) {
     const location = this.getUniformLocation(name);
-    if (!location) throw new Error(`Uniform ${name} not found`);
+    if (!location) {
+      return undefined;
+    }
     this.gl.uniformMatrix4fv(location, false, value);
   }
 

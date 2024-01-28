@@ -60,12 +60,8 @@ export class Scene {
       texturesManager: this.texturesManager,
       texturesToUse: [
         {
-          textureSrc: "/public/assets/models/crab/crab.png",
+          textureSrc: "/public/assets/models/efa/efa.png",
           uniformName: "u_image",
-        },
-        {
-          textureSrc: "/public/assets/models/crab/crab.png",
-          uniformName: "u_image2",
         },
       ],
       uniforms: {
@@ -83,10 +79,6 @@ export class Scene {
           textureSrc: "/public/assets/models/f22/f22.png",
           uniformName: "u_image",
         },
-        {
-          textureSrc: "/public/assets/models/efa/efa.png",
-          uniformName: "u_image2",
-        },
       ],
       uniforms: {
         u_time: globalState.uTime,
@@ -97,7 +89,7 @@ export class Scene {
       gl: this.gl,
       shaderProgram: this.shaderProgram,
       geometry: this.geometriesManager.getGeometry(
-        "/public/assets/models/crab/crab.obj"
+        "/public/assets/models/efa/efa.obj"
       ),
     });
 
