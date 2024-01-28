@@ -3,11 +3,10 @@ import { mat4, vec3 } from "gl-matrix";
 import { ShaderProgram } from "./ShaderProgram";
 import { createAndInitBuffer, setupVertexAttribute } from "./Util";
 import { Camera } from "./Camera";
+import { GeometryObject } from "./parseOBJ";
 
 interface Constructor {
-  vertices: number[];
-  normals: number[];
-  texcoords: number[];
+  geometry: GeometryObject | null;
   shaderProgram: ShaderProgram;
   gl: WebGL2RenderingContext;
 }
@@ -35,13 +34,15 @@ export class Mesh {
   rotation = vec3.fromValues(0, 0, 0);
 
   constructor(props: Constructor) {
-    const { gl, shaderProgram, vertices, normals, texcoords } = props;
+    const { gl, shaderProgram, geometry } = props;
+
+    if (!geometry) throw new Error("No geometry provided for the Mesh");
 
     this.gl = gl;
     this.shaderProgram = shaderProgram;
-    this.vertices = vertices.map((n) => n * 0.04);
-    this.normals = normals;
-    this.texcoords = texcoords;
+    this.vertices = geometry.vertices.map((n) => n * 0.04);
+    this.normals = geometry.normals;
+    this.texcoords = geometry.texcoords;
 
     this.init();
   }

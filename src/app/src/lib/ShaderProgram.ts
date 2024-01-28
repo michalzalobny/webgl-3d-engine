@@ -1,7 +1,17 @@
+import { useTexture } from "./Util";
+import { TexturesManager } from "./TexturesManager";
+
+interface TextureToUse {
+  textureSrc: string;
+  uniformName: string;
+}
+
 interface Props {
   vertexCode: string;
   fragmentCode: string;
   gl: WebGL2RenderingContext | null;
+  texturesToUse?: TextureToUse[];
+  texturesManager: TexturesManager;
 }
 
 export class ShaderProgram {
@@ -9,11 +19,15 @@ export class ShaderProgram {
   private fragmentCode: string;
   private gl: WebGL2RenderingContext;
   program: WebGLProgram | null = null;
+  private texturesManager;
 
   uniformLocations = new Map<string, WebGLUniformLocation>();
 
+  texturesToUse: TextureToUse[] = [];
+
   constructor(props: Props) {
-    const { vertexCode, fragmentCode, gl } = props;
+    const { vertexCode, fragmentCode, gl, texturesToUse, texturesManager } =
+      props;
 
     this.vertexCode = vertexCode;
     this.fragmentCode = fragmentCode;
@@ -23,6 +37,10 @@ export class ShaderProgram {
     }
 
     this.gl = gl;
+
+    this.texturesManager = texturesManager;
+    if (texturesToUse) this.texturesToUse = texturesToUse;
+
     this.init(this.gl);
   }
 
@@ -114,9 +132,27 @@ export class ShaderProgram {
   }
 
   use() {
-    if (!this.program)
+    if (!this.program) {
       throw new Error("Cannot use program, program is not set");
+    }
     this.gl.useProgram(this.program);
+
+    // Bind textures
+    this.texturesToUse.forEach((el) => {
+      const textureObj = this.texturesManager.getTexture(
+        "/public/assets/models/crab/crab.png"
+      );
+
+      if (!textureObj) return;
+
+      useTexture({
+        gl: this.gl,
+        shaderProgram: this.program,
+        uniformLocation: this.getUniformLocation(el.uniformName),
+        texture: textureObj.texture,
+        textureIndex: textureObj.textureIndex,
+      });
+    });
   }
 
   destroy() {

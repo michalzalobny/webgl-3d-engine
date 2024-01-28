@@ -1,5 +1,4 @@
 interface Constructor {
-  texturesToLoad: string[];
   gl: WebGL2RenderingContext | null;
 }
 
@@ -19,25 +18,14 @@ interface LoadTexture {
 export class TexturesManager {
   private gl: WebGL2RenderingContext | null = null;
   private isReady = false;
+  private startedLoading = false;
   private loadedTextures: Map<string, TextureObject> = new Map();
 
   constructor(props: Constructor) {
-    const { texturesToLoad, gl } = props;
+    const { gl } = props;
 
     this.gl = gl;
     if (!this.gl) return;
-
-    const promises = texturesToLoad.map((textureUrl, key) => {
-      return this.loadTexture({
-        gl: this.gl,
-        url: textureUrl,
-        textureIndex: key,
-      });
-    });
-
-    Promise.allSettled(promises).then(() => {
-      this.isReady = true;
-    });
   }
 
   getTexture(textureUrl: string) {
@@ -117,5 +105,33 @@ export class TexturesManager {
 
     // Unbind the texture
     gl.bindTexture(gl.TEXTURE_2D, null);
+  }
+
+  async addTexturesToLoad(texturesToLoad: string[]) {
+    if (!this.gl) {
+      return console.error("WebGL context not available for TexturesManager.");
+    }
+
+    if (this.startedLoading) {
+      console.error(
+        "TexturesManager already started loading textures. Cannot add more textures."
+      );
+      return;
+    }
+
+    this.startedLoading = true;
+
+    const promises = texturesToLoad.map((textureUrl, key) => {
+      return this.loadTexture({
+        gl: this.gl,
+        url: textureUrl,
+        textureIndex: key,
+      });
+    });
+
+    return Promise.allSettled(promises).then(() => {
+      this.isReady = true;
+      Promise.resolve();
+    });
   }
 }

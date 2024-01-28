@@ -1,4 +1,10 @@
-export const parseOBJ = (text: string) => {
+export interface GeometryObject {
+  vertices: number[];
+  normals: number[];
+  texcoords: number[];
+}
+
+export const parseOBJ = (text: string): GeometryObject => {
   const vertices_lookup: number[][] = [];
   const normals_lookup: number[][] = [];
   const texcoords_lookup: number[][] = [];

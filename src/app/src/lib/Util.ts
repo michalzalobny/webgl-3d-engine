@@ -41,13 +41,13 @@ export const setupVertexAttribute = (props: SetupVertexAttribute) => {
 interface UseTexture {
   gl: WebGL2RenderingContext | null;
   shaderProgram: WebGLProgram | null;
-  uniformLocations: (WebGLUniformLocation | undefined)[];
+  uniformLocation: WebGLUniformLocation | undefined;
   textureIndex: number;
   texture: WebGLTexture;
 }
 
 export const useTexture = (props: UseTexture) => {
-  const { gl, shaderProgram, texture, textureIndex, uniformLocations } = props;
+  const { gl, shaderProgram, texture, textureIndex, uniformLocation } = props;
 
   if (!gl || !shaderProgram) {
     throw new Error(
@@ -58,8 +58,7 @@ export const useTexture = (props: UseTexture) => {
   gl.activeTexture(gl.TEXTURE0 + textureIndex);
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
-  uniformLocations.forEach((location) => {
-    if (!location) return;
-    gl.uniform1i(location, textureIndex);
-  });
+  if (!uniformLocation) return;
+
+  gl.uniform1i(uniformLocation, textureIndex);
 };
