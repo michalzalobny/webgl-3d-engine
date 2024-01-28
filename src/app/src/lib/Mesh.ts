@@ -135,7 +135,12 @@ export class Mesh {
     const drawMode = this.gl.TRIANGLES;
     this.gl.drawArrays(drawMode, 0, this.vertices.length / 3);
 
+    // Unbind VAO
     this.gl.bindVertexArray(null);
+
+    // Unbind textures - doing it here due to asynchronous nature of WebGL handling
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    this.gl.activeTexture(this.gl.TEXTURE0);
   }
 
   destroy() {

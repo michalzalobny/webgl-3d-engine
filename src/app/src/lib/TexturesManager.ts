@@ -134,4 +134,11 @@ export class TexturesManager {
       Promise.resolve();
     });
   }
+
+  destroy() {
+    this.loadedTextures.forEach((textureObject) => {
+      this.gl?.deleteTexture(textureObject.texture);
+    });
+    this.loadedTextures.clear();
+  }
 }

@@ -206,8 +206,12 @@ export class Scene {
 
   destroy() {
     this.shaderProgram?.destroy();
+    this.shaderProgram2?.destroy();
 
     this.mesh?.destroy();
     this.mesh2?.destroy();
+
+    this.geometriesManager?.destroy();
+    this.texturesManager?.destroy();
   }
 }

@@ -43,4 +43,8 @@ export class GeometriesManager {
       Promise.resolve();
     });
   }
+
+  destroy() {
+    this.loadedGeometries.clear();
+  }
 }
