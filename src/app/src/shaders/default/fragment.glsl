@@ -25,10 +25,10 @@ void main() {
   normal = normalize(normal);
 
   // Ambient lighting
-  float ambient = 0.12;
+  float ambient = 0.3;
 
   // Diffuse lighting
-  vec3 lightPosition = vec3(0.0, 2.0, 3.0);
+  vec3 lightPosition = vec3(0.0, 3.0, 10.0);
   vec3 lightDirection = normalize(lightPosition);
   float diffuse = max(dot(normal, lightDirection), 0.0);
 
@@ -41,6 +41,9 @@ void main() {
   color.rgb *= diffuse;
   color.rgb += specular;
   color.rgb += ambient;
+
+  // Gamma correction
+  color.rgb = pow(color.rgb, vec3(1.0 / 0.55));
 
   outColor = color;
 }
