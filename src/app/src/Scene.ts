@@ -125,26 +125,28 @@ export class Scene {
       0.06 * globalState.slowDownFactor.value
     );
 
-    this.camera.updateViewMatrix({
-      eye: [-mouse2DCurrent[0] * 0.5, -mouse2DCurrent[1] * 0.1, 0.5],
-    });
-
     if (this.mesh) {
-      this.mesh.rotation[2] += 0.01 * globalState.slowDownFactor.value;
-      this.mesh.rotation[0] += 0.02 * globalState.slowDownFactor.value;
+      this.mesh.rotation[2] = -mouse2DCurrent[0] * 1.2;
+      this.mesh.rotation[0] = mouse2DCurrent[1] * 2.2;
 
       this.mesh.scale = vec3.fromValues(
-        mouse2DCurrent[1] * 1 + 1.2,
-        mouse2DCurrent[1] * 1 + 1.2,
-        mouse2DCurrent[1] * 1 + 1.2
+        -mouse2DCurrent[1] * 1 + 1.2,
+        -mouse2DCurrent[1] * 1 + 1.2,
+        -mouse2DCurrent[1] * 1 + 1.2
+      );
+
+      this.mesh.position = vec3.fromValues(
+        mouse2DCurrent[0] * -0.5,
+        mouse2DCurrent[1] * -0.1,
+        0
       );
 
       this.mesh.render({ camera: this.camera });
     }
 
     if (this.mesh2) {
-      this.mesh2.rotation[2] -= 0.005 * globalState.slowDownFactor.value;
-      this.mesh2.rotation[0] -= 0.01 * globalState.slowDownFactor.value;
+      this.mesh2.rotation[2] = mouse2DCurrent[0] * 1.2;
+      this.mesh2.rotation[0] = -mouse2DCurrent[1] * 1.2;
 
       this.mesh2.scale = vec3.fromValues(
         mouse2DCurrent[1] * 1 + 1.2,

@@ -28,7 +28,7 @@ export class Mesh {
   private normalBuffer: WebGLBuffer | null = null;
   private uvBuffer: WebGLBuffer | null = null;
 
-  private modelViewMatrix = mat4.create();
+  private modelMatrix = mat4.create();
 
   position = vec3.fromValues(0, 0, 0);
   scale = vec3.fromValues(1, 1, 1);
@@ -109,25 +109,16 @@ export class Mesh {
     this.gl.bindVertexArray(this.VAO);
 
     // Construct model matrix
-    mat4.identity(this.modelViewMatrix);
-    mat4.translate(this.modelViewMatrix, this.modelViewMatrix, this.position);
-    mat4.scale(this.modelViewMatrix, this.modelViewMatrix, this.scale);
-    mat4.rotateX(this.modelViewMatrix, this.modelViewMatrix, this.rotation[0]);
-    mat4.rotateY(this.modelViewMatrix, this.modelViewMatrix, this.rotation[1]);
-    mat4.rotateZ(this.modelViewMatrix, this.modelViewMatrix, this.rotation[2]);
+    mat4.identity(this.modelMatrix);
+    mat4.translate(this.modelMatrix, this.modelMatrix, this.position);
+    mat4.scale(this.modelMatrix, this.modelMatrix, this.scale);
+    mat4.rotateX(this.modelMatrix, this.modelMatrix, this.rotation[0]);
+    mat4.rotateY(this.modelMatrix, this.modelMatrix, this.rotation[1]);
+    mat4.rotateZ(this.modelMatrix, this.modelMatrix, this.rotation[2]);
 
-    // Multiply model matrix with view matrix (camera)
-    mat4.multiply(
-      this.modelViewMatrix,
-      camera.viewMatrix,
-      this.modelViewMatrix
-    );
-
-    this.shaderProgram.setUniformMatrix4fv(
-      "u_modelViewMatrix",
-      this.modelViewMatrix
-    );
-
+    // Load model matrix, view matrix and projection matrix to shader
+    this.shaderProgram.setUniformMatrix4fv("u_modelMatrix", this.modelMatrix);
+    this.shaderProgram.setUniformMatrix4fv("u_viewMatrix", camera.viewMatrix);
     this.shaderProgram.setUniformMatrix4fv(
       "u_projectionMatrix",
       camera.perspectiveProjectionMatrix
