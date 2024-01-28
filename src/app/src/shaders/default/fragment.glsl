@@ -55,8 +55,8 @@ void main() {
   uv.y = 1.0 - uv.y;
 
   float t = u_time * 0.1;
-  vec2 rainDistort = Rain(uv * 5.0, t) * 0.5;
-  rainDistort += Rain(uv * 7.0, t) * 0.5;
+  vec2 rainDistort = Rain(vec2(uv.y, 1.0-uv.x) * 5.0, t) * 0.5;
+  rainDistort += Rain(vec2(uv.y, 1.0-uv.x) * 7.0, t) * 0.5;
 
   uv += rainDistort;
 
