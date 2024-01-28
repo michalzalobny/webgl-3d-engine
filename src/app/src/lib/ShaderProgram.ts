@@ -10,6 +10,8 @@ export class ShaderProgram {
   private gl: WebGL2RenderingContext;
   program: WebGLProgram | null = null;
 
+  uniformLocations = new Map<string, WebGLUniformLocation>();
+
   constructor(props: Props) {
     const { vertexCode, fragmentCode, gl } = props;
 
@@ -78,16 +80,19 @@ export class ShaderProgram {
     this.program = program;
   }
 
-  getAttributeLocation(name: string) {
-    if (!this.program)
-      throw new Error("Cannot get attribute location, program not initialized");
-    return this.gl.getAttribLocation(this.program, name);
-  }
-
   getUniformLocation(name: string) {
-    if (!this.program)
+    if (!this.program) {
       throw new Error("Cannot get uniform location, program not initialized");
-    return this.gl.getUniformLocation(this.program, name);
+    }
+
+    // If uniform location is not cached, get it from the GPU
+    if (!this.uniformLocations.has(name)) {
+      const location = this.gl.getUniformLocation(this.program, name);
+      if (!location) throw new Error(`Uniform ${name} not found`);
+      this.uniformLocations.set(name, location);
+    }
+    const cachedLocation = this.uniformLocations.get(name);
+    return cachedLocation;
   }
 
   setUniform1f(name: string, value: number) {

@@ -10,6 +10,8 @@ import { parseOBJ } from "./lib/parseOBJ";
 import { Camera } from "./lib/Camera";
 import { lerp } from "./utils/lerp";
 import { vec3 } from "gl-matrix";
+import { useTexture } from "./lib/Util";
+import { TexturesManager } from "./lib/TexturesManager";
 
 export class Scene {
   private gl: WebGL2RenderingContext | null = null;
@@ -19,11 +21,22 @@ export class Scene {
   private mesh: Mesh | null = null;
   private shaderProgram: ShaderProgram | null = null;
 
+  private texturesManager;
+
   constructor() {
     if (globalState.canvasEl) {
       this.gl = globalState.canvasEl.getContext("webgl2");
     }
     if (!this.gl) throw new Error("WebGL2 not supported");
+
+    this.texturesManager = new TexturesManager({
+      texturesToLoad: [
+        "/public/assets/models/crab/crab.png",
+        "/public/assets/models/f22/f22.png",
+        "/public/assets/models/efa/efa.png",
+      ],
+      gl: this.gl,
+    });
 
     void this.init();
   }
@@ -31,7 +44,7 @@ export class Scene {
   private async init() {
     if (!this.gl) return;
 
-    const response = await fetch("/public/assets/models/f22/f22.obj");
+    const response = await fetch("/public/assets/models/crab/crab.obj");
     const text = await response.text();
     const objData = parseOBJ(text);
 
@@ -76,6 +89,20 @@ export class Scene {
     this.camera.updateViewMatrix({
       eye: [-mouse2DCurrent[0] * 0.5, -mouse2DCurrent[1] * 0.1, 0.5],
     });
+
+    // Use proper texture
+    const textureObj = this.texturesManager.getTexture(
+      "/public/assets/models/crab/crab.png"
+    );
+    if (textureObj) {
+      useTexture({
+        gl: this.gl,
+        shaderProgram: this.shaderProgram.program,
+        uniformLocations: [this.shaderProgram.getUniformLocation("u_image")],
+        texture: textureObj.texture,
+        textureIndex: textureObj.textureIndex,
+      });
+    }
 
     if (this.mesh) {
       this.mesh.rotation[2] += 0.01 * globalState.slowDownFactor.value;

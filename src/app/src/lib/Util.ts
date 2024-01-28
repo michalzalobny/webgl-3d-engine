@@ -37,3 +37,29 @@ export const setupVertexAttribute = (props: SetupVertexAttribute) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
   return location;
 };
+
+interface UseTexture {
+  gl: WebGL2RenderingContext | null;
+  shaderProgram: WebGLProgram | null;
+  uniformLocations: (WebGLUniformLocation | undefined)[];
+  textureIndex: number;
+  texture: WebGLTexture;
+}
+
+export const useTexture = (props: UseTexture) => {
+  const { gl, shaderProgram, texture, textureIndex, uniformLocations } = props;
+
+  if (!gl || !shaderProgram) {
+    throw new Error(
+      "Cannot use texture. WebGL context or shader program is not available. "
+    );
+  }
+
+  gl.activeTexture(gl.TEXTURE0 + textureIndex);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  uniformLocations.forEach((location) => {
+    if (!location) return;
+    gl.uniform1i(location, textureIndex);
+  });
+};
