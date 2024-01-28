@@ -128,7 +128,7 @@ export class Scene {
     let w = globalState.stageSize.value[0];
     let h = globalState.stageSize.value[1];
 
-    updateDebug(`Window size: ${w.toFixed(1)} X ${h.toFixed(1)}`);
+    // updateDebug(`Window size: ${w.toFixed(1)} X ${h.toFixed(1)}`);
 
     const ratio = globalState.pixelRatio.value;
 

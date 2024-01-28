@@ -4,7 +4,8 @@ The goal is to build a custom 3D engine without any libraries - just using WebGL
 
 I'm using here Right-Handed Coordinate System (positive Z axis points out of the screen). I'm also using column-major matrices layout - so I will be using post-multiplication -> `M * v` to transform a vector `v` by a matrix `M`.
 
-## Performance
+## Lighthouse Performance
 
 - Application without any WebGL2 context scores 4x 100% on lighthouse, with 0ms of Total Blocking Time, 0.8s First and Largest Contentful Paint. Speed index is 0.8s.
 - After adding the WebGL2 context, the Total Blocking Time increases to 40ms.
+- After adding 4 textures to load into GPU and a model to parse, the Total Blocking Time increases to 60ms. The rest of the metrics are the same.
