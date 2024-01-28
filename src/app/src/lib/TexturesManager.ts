@@ -23,8 +23,8 @@ export class TexturesManager {
     this.gl = gl;
     if (!this.gl) return;
 
-    const promises = texturesToLoad.map(async (textureUrl, key) => {
-      await this.loadTexture(this.gl, textureUrl, key);
+    const promises = texturesToLoad.map((textureUrl, key) => {
+      return this.loadTexture(this.gl, textureUrl, key);
     });
 
     Promise.all(promises).then(() => {
