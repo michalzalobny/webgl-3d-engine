@@ -46,7 +46,7 @@ export class Scene {
   private async init() {
     if (!this.gl) return;
 
-    const response = await fetch("/public/assets/models/crab/crab.obj");
+    const response = await fetch("/public/assets/models/f22/f22.obj");
     const text = await response.text();
     const objData = parseOBJ(text);
 
@@ -94,7 +94,7 @@ export class Scene {
 
     // Use proper texture
     const textureObj = this.texturesManager.getTexture(
-      "/public/assets/models/crab/crab.png"
+      "/public/assets/models/f22/f22.png"
     );
     if (textureObj) {
       useTexture({

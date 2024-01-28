@@ -10,12 +10,16 @@ interface TextureObject {
   height: number;
 }
 
+interface LoadTexture {
+  gl: WebGL2RenderingContext | null;
+  url: string;
+  textureIndex: number;
+}
+
 export class TexturesManager {
   private gl: WebGL2RenderingContext | null = null;
-
-  loadedTextures: Map<string, TextureObject> = new Map();
-
-  isReady = false;
+  private isReady = false;
+  private loadedTextures: Map<string, TextureObject> = new Map();
 
   constructor(props: Constructor) {
     const { texturesToLoad, gl } = props;
@@ -24,10 +28,14 @@ export class TexturesManager {
     if (!this.gl) return;
 
     const promises = texturesToLoad.map((textureUrl, key) => {
-      return this.loadTexture(this.gl, textureUrl, key);
+      return this.loadTexture({
+        gl: this.gl,
+        url: textureUrl,
+        textureIndex: key,
+      });
     });
 
-    Promise.all(promises).then(() => {
+    Promise.allSettled(promises).then(() => {
       this.isReady = true;
     });
   }
@@ -36,75 +44,20 @@ export class TexturesManager {
     const textureObject = this.loadedTextures.get(textureUrl);
     if (!this.isReady) return null;
     if (!textureObject) {
-      console.error(`Texture ${textureUrl} not found.`);
+      console.error(`Texture not found. ${textureUrl} `);
       return null;
     }
     return textureObject;
   }
 
-  // Function to load a texture
-  private async loadTexture(
-    gl: WebGL2RenderingContext | null,
-    url: string,
-    textureIndex: number
-  ) {
+  private loadImage(url: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.crossOrigin = "anonymous";
       image.src = url;
 
       const onLoaded = () => {
-        if (!gl) {
-          console.error("WebGL context or shader program is not available.");
-          reject();
-          return;
-        }
-
-        // Create and bind the texture
-        const texture = gl.createTexture();
-        if (!texture) {
-          console.error("Unable to create texture.");
-          reject();
-          return;
-        }
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-
-        const mode = gl.REPEAT; // or gl.CLAMP_TO_EDGE
-
-        // Set the texture parameters
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, mode);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, mode);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-        // Upload the image to the texture
-        gl.texImage2D(
-          gl.TEXTURE_2D,
-          0,
-          gl.RGBA,
-          gl.RGBA,
-          gl.UNSIGNED_BYTE,
-          image
-        );
-
-        const isPowerOfTwo = (value: number) => {
-          return (value & (value - 1)) == 0;
-        };
-        if (isPowerOfTwo(image.width) && isPowerOfTwo(image.height)) {
-          gl.generateMipmap(gl.TEXTURE_2D);
-        }
-
-        this.loadedTextures.set(url, {
-          texture,
-          height: image.height,
-          width: image.width,
-          textureIndex,
-        });
-
-        // Unbind the texture
-        gl.bindTexture(gl.TEXTURE_2D, null);
-
-        resolve(null);
+        resolve(image);
       };
 
       if (image.complete) {
@@ -117,5 +70,52 @@ export class TexturesManager {
         };
       }
     });
+  }
+
+  private async loadTexture(props: LoadTexture) {
+    const { gl, url, textureIndex } = props;
+
+    const image = await this.loadImage(url);
+
+    if (!gl) {
+      return console.error("WebGL context or shader program is not available.");
+    }
+
+    // Create and bind the texture
+    const texture = gl.createTexture();
+    if (!texture) {
+      return console.error("Unable to create texture.");
+    }
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    const mode = gl.REPEAT; // or gl.CLAMP_TO_EDGE
+
+    // Set the texture parameters
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, mode);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, mode);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    // Upload the image to the texture
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+    // Generate mipmaps
+    const isPowerOfTwo = (value: number) => {
+      return (value & (value - 1)) == 0;
+    };
+    if (isPowerOfTwo(image.width) && isPowerOfTwo(image.height)) {
+      gl.generateMipmap(gl.TEXTURE_2D);
+    }
+
+    // Add the texture to the loaded textures
+    this.loadedTextures.set(url, {
+      texture,
+      height: image.height,
+      width: image.width,
+      textureIndex,
+    });
+
+    // Unbind the texture
+    gl.bindTexture(gl.TEXTURE_2D, null);
   }
 }
