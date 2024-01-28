@@ -25,7 +25,7 @@ void main() {
   normal = normalize(normal);
 
   // Ambient lighting
-  float ambient = 0.1;
+  float ambient = 0.12;
 
   // Diffuse lighting
   vec3 lightPosition = vec3(0.0, 2.0, 3.0);
