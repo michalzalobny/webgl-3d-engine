@@ -128,14 +128,14 @@ export class Scene {
     // Update camera
     this.camera.updateViewMatrix({
       target: vec3.fromValues(
-        mouse2DCurrent[0] * -0.5,
-        mouse2DCurrent[1] * 0.1,
+        mouse2DCurrent[0] * -0.25,
+        mouse2DCurrent[1] * 0.05,
         -1
       ),
     });
 
     if (this.mesh) {
-      this.mesh.rotation[2] = -mouse2DCurrent[0] * 1.2;
+      this.mesh.rotation[2] = -mouse2DCurrent[0] * 0.4;
       this.mesh.rotation[0] = mouse2DCurrent[1] * 2.2;
 
       this.mesh.scale = vec3.fromValues(
