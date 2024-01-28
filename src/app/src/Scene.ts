@@ -146,7 +146,8 @@ export class Scene {
 
       this.mesh.position = vec3.fromValues(
         mouse2DCurrent[0] * -0.5,
-        mouse2DCurrent[1] * -0.1,
+        mouse2DCurrent[1] * -0.1 +
+          Math.sin(globalState.uTime.value * 1.2) * 0.03,
         0
       );
 
@@ -165,7 +166,8 @@ export class Scene {
 
       this.mesh2.position = vec3.fromValues(
         mouse2DCurrent[0] * 0.5,
-        mouse2DCurrent[1] * 0.1,
+        mouse2DCurrent[1] * 0.1 +
+          Math.sin(globalState.uTime.value * 0.8) * 0.02,
         0
       );
 
