@@ -34,6 +34,8 @@ export class Scene {
         "/public/assets/models/crab/crab.png",
         "/public/assets/models/f22/f22.png",
         "/public/assets/models/efa/efa.png",
+        "/public/assets/models/f117/f117.png",
+        "/public/assets/models/cube/cube.png",
       ],
       gl: this.gl,
     });
