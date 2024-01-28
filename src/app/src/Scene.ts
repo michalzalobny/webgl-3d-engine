@@ -63,6 +63,9 @@ export class Scene {
           uniformName: "u_image2",
         },
       ],
+      uniforms: {
+        u_time: globalState.uTime,
+      },
     });
 
     this.mesh = new Mesh({

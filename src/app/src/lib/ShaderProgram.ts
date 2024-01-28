@@ -6,11 +6,17 @@ interface TextureToUse {
   uniformName: string;
 }
 
+interface UniformValue {
+  value: number | number[] | Float32Array;
+}
+type Uniforms = Record<string, UniformValue>;
+
 interface Props {
   vertexCode: string;
   fragmentCode: string;
   gl: WebGL2RenderingContext | null;
   texturesToUse?: TextureToUse[];
+  uniforms?: Uniforms;
   texturesManager: TexturesManager;
 }
 
@@ -24,22 +30,30 @@ export class ShaderProgram {
   uniformLocations = new Map<string, WebGLUniformLocation>();
 
   texturesToUse: TextureToUse[] = [];
+  uniforms: Uniforms = {};
 
   constructor(props: Props) {
-    const { vertexCode, fragmentCode, gl, texturesToUse, texturesManager } =
-      props;
-
-    this.vertexCode = vertexCode;
-    this.fragmentCode = fragmentCode;
+    const {
+      vertexCode,
+      fragmentCode,
+      gl,
+      texturesToUse,
+      texturesManager,
+      uniforms,
+    } = props;
 
     if (!gl) {
       throw new Error("No gl context provided to ShaderProgram constructor");
     }
-
     this.gl = gl;
 
+    this.vertexCode = vertexCode;
+    this.fragmentCode = fragmentCode;
+
     this.texturesManager = texturesManager;
+
     if (texturesToUse) this.texturesToUse = texturesToUse;
+    if (uniforms) this.uniforms = uniforms;
 
     this.init(this.gl);
   }
@@ -140,7 +154,6 @@ export class ShaderProgram {
     // Bind textures
     this.texturesToUse.forEach((el) => {
       const textureObj = this.texturesManager.getTexture(el.textureSrc);
-
       if (!textureObj) return;
 
       useTexture({
@@ -150,6 +163,20 @@ export class ShaderProgram {
         texture: textureObj.texture,
         textureIndex: textureObj.textureIndex,
       });
+    });
+
+    // Set uniforms
+    Object.entries(this.uniforms).forEach(([objKey, objValue]) => {
+      const value = objValue.value;
+      if (typeof value === "number") {
+        this.setUniform1f(objKey, value);
+      } else if (value instanceof Array) {
+        if (value.length === 4) {
+          this.setUniform4f(objKey, [value[0], value[1], value[2], value[3]]);
+        }
+      } else if (value instanceof Float32Array) {
+        this.setUniformMatrix4fv(objKey, value);
+      }
     });
   }
 
