@@ -31,6 +31,7 @@ export class Scene {
     this.texturesManager = new TexturesManager({ gl: this.gl });
 
     void this.init();
+    this.addEventListeners();
   }
 
   private async init() {
@@ -204,6 +205,20 @@ export class Scene {
     });
   }
 
+  private onPointerClick = () => {
+    // Limit to 3 draw modes
+    globalState.drawMode += 1;
+    globalState.drawMode %= 3;
+  };
+
+  private addEventListeners() {
+    window.addEventListener("pointerdown", this.onPointerClick);
+  }
+
+  private removeEventListeners() {
+    window.removeEventListener("pointerdown", this.onPointerClick);
+  }
+
   destroy() {
     this.shaderProgram?.destroy();
     this.shaderProgram2?.destroy();
@@ -213,5 +228,7 @@ export class Scene {
 
     this.geometriesManager?.destroy();
     this.texturesManager?.destroy();
+
+    this.removeEventListeners();
   }
 }

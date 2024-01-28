@@ -4,6 +4,7 @@ import { ShaderProgram } from "./ShaderProgram";
 import { createAndInitBuffer, setupVertexAttribute } from "./Util";
 import { Camera } from "./Camera";
 import { GeometryObject } from "./parseOBJ";
+import { globalState } from "../utils/globalState";
 
 interface Constructor {
   geometry: GeometryObject | null;
@@ -132,7 +133,9 @@ export class Mesh {
       camera.perspectiveProjectionMatrix
     );
 
-    const drawMode = this.gl.TRIANGLES;
+    const drawMode = [this.gl.TRIANGLES, this.gl.LINES, this.gl.POINTS][
+      globalState.drawMode
+    ];
     this.gl.drawArrays(drawMode, 0, this.vertices.length / 3);
 
     // Unbind VAO
