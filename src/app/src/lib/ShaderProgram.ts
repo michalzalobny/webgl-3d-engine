@@ -139,9 +139,7 @@ export class ShaderProgram {
 
     // Bind textures
     this.texturesToUse.forEach((el) => {
-      const textureObj = this.texturesManager.getTexture(
-        "/public/assets/models/crab/crab.png"
-      );
+      const textureObj = this.texturesManager.getTexture(el.textureSrc);
 
       if (!textureObj) return;
 

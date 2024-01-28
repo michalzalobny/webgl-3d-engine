@@ -58,6 +58,10 @@ export class Scene {
           textureSrc: "/public/assets/models/crab/crab.png",
           uniformName: "u_image",
         },
+        {
+          textureSrc: "/public/assets/models/f22/f22.png",
+          uniformName: "u_image2",
+        },
       ],
     });
 
