@@ -136,7 +136,7 @@ export class Scene {
 
     if (this.mesh) {
       this.mesh.rotation[2] = -mouse2DCurrent[0] * 0.4;
-      this.mesh.rotation[0] = mouse2DCurrent[1] * 2.2;
+      this.mesh.rotation[0] = mouse2DCurrent[1] * 3.2;
 
       this.mesh.scale = vec3.fromValues(
         -mouse2DCurrent[1] * 1 + 1.2,
@@ -144,31 +144,33 @@ export class Scene {
         -mouse2DCurrent[1] * 1 + 1.2
       );
 
+      const floatY = Math.sin(globalState.uTime.value * 1.2) * 0.03;
+
       this.mesh.position = vec3.fromValues(
         mouse2DCurrent[0] * -0.5,
-        mouse2DCurrent[1] * -0.1 +
-          Math.sin(globalState.uTime.value * 1.2) * 0.03,
-        0
+        mouse2DCurrent[1] * -0.1 + floatY - 0.03,
+        -mouse2DCurrent[1] * 0.2 - 0.02
       );
 
       this.mesh.render({ camera: this.camera });
     }
 
     if (this.mesh2) {
-      this.mesh2.rotation[2] = mouse2DCurrent[0] * 1.2;
+      this.mesh2.rotation[2] = mouse2DCurrent[0] * 0.8;
       this.mesh2.rotation[0] = -mouse2DCurrent[1] * 1.2;
 
       this.mesh2.scale = vec3.fromValues(
-        mouse2DCurrent[1] * 1 + 1.2,
-        mouse2DCurrent[1] * 1 + 1.2,
-        mouse2DCurrent[1] * 1 + 1.2
+        mouse2DCurrent[1] * 0.5 + 1.2,
+        mouse2DCurrent[1] * 0.5 + 1.2,
+        mouse2DCurrent[1] * 0.5 + 1.2
       );
+
+      const floatY = Math.sin(globalState.uTime.value * 0.8) * 0.02;
 
       this.mesh2.position = vec3.fromValues(
         mouse2DCurrent[0] * 0.5,
-        mouse2DCurrent[1] * 0.1 +
-          Math.sin(globalState.uTime.value * 0.8) * 0.02,
-        0
+        mouse2DCurrent[1] * 0.1 + floatY + 0.03,
+        mouse2DCurrent[1] * 0.2 - 0.05
       );
 
       this.mesh2.render({ camera: this.camera });
