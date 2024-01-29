@@ -47,8 +47,8 @@ export class Scene {
 
     await this.texturesManager.addTexturesToLoad([
       // "/public/assets/models/crab/crab.png",
-      "/public/assets/models/f22/f22.avif",
-      "/public/assets/models/efa/efa.avif",
+      "/public/assets/models/f22/f22.webp",
+      "/public/assets/models/efa/efa.webp",
       // "/public/assets/models/f117/f117.png",
       // "/public/assets/models/cube/cube.png",
     ]);
@@ -60,7 +60,7 @@ export class Scene {
       texturesManager: this.texturesManager,
       texturesToUse: [
         {
-          textureSrc: "/public/assets/models/efa/efa.avif",
+          textureSrc: "/public/assets/models/efa/efa.webp",
           uniformName: "u_image",
         },
       ],
@@ -76,7 +76,7 @@ export class Scene {
       texturesManager: this.texturesManager,
       texturesToUse: [
         {
-          textureSrc: "/public/assets/models/f22/f22.avif",
+          textureSrc: "/public/assets/models/f22/f22.webp",
           uniformName: "u_image",
         },
       ],
