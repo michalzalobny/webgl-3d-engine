@@ -38,19 +38,19 @@ export class Scene {
     if (!this.gl) return;
 
     await this.geometriesManager.addObjectsToLoad([
-      "/public/assets/models/crab/crab.obj",
+      // "/public/assets/models/crab/crab.obj",
       "/public/assets/models/f22/f22.obj",
       "/public/assets/models/efa/efa.obj",
-      "/public/assets/models/f117/f117.obj",
-      "/public/assets/models/cube/cube.obj",
+      // "/public/assets/models/f117/f117.obj",
+      // "/public/assets/models/cube/cube.obj",
     ]);
 
     await this.texturesManager.addTexturesToLoad([
-      "/public/assets/models/crab/crab.png",
+      // "/public/assets/models/crab/crab.png",
       "/public/assets/models/f22/f22.png",
       "/public/assets/models/efa/efa.png",
-      "/public/assets/models/f117/f117.png",
-      "/public/assets/models/cube/cube.png",
+      // "/public/assets/models/f117/f117.png",
+      // "/public/assets/models/cube/cube.png",
     ]);
 
     this.shaderProgram = new ShaderProgram({
