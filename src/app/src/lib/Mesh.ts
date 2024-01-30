@@ -119,6 +119,7 @@ export class Mesh {
     // Load model matrix, view matrix and projection matrix to shader
     this.shaderProgram.setUniformMatrix4fv("u_modelMatrix", this.modelMatrix);
     this.shaderProgram.setUniformMatrix4fv("u_viewMatrix", camera.viewMatrix);
+    this.shaderProgram.setUniform3f("u_cameraPositionWorld", camera.position);
     this.shaderProgram.setUniformMatrix4fv(
       "u_projectionMatrix",
       camera.perspectiveProjectionMatrix

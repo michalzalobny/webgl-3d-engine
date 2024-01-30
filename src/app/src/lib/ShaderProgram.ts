@@ -145,6 +145,14 @@ export class ShaderProgram {
     this.gl.uniform4f(location, value[0], value[1], value[2], value[3]);
   }
 
+  setUniform3f(name: string, value: [number, number, number] | Float32Array) {
+    const location = this.getUniformLocation(name);
+    if (!location) {
+      return undefined;
+    }
+    this.gl.uniform3f(location, value[0], value[1], value[2]);
+  }
+
   setUniformMatrix4fv(name: string, value: Float32Array | number[]) {
     const location = this.getUniformLocation(name);
     if (!location) {

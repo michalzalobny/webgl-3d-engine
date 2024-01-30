@@ -3,12 +3,13 @@
 precision highp float;
 
 in vec2 v_uv;
-in vec3 v_normal;
-in mat4 v_modelMatrix;
-in mat4 v_viewMatrix;
+in vec3 v_fragNormal;
+in vec3 v_fragPosition;
 
 uniform sampler2D u_image;
 uniform float u_time;
+uniform vec3 u_cameraPositionWorld;
+uniform mat4 u_viewMatrix;
 
 // we need to declare an output for the fragment shader
 out vec4 outColor;
@@ -46,46 +47,48 @@ vec2 Rain(vec2 uv, float t){
 
     // if(st.x> .48 || st.y > .49) m1 = 1.0;
     return vec2(m1 * o1 * 30.0 + m2 * o2 * 10.0);
-
 }
 
 void main() {
-
   vec2 uv = v_uv;
   uv.y = 1.0 - uv.y;
 
+  // Rain effect
   float t = u_time * 0.1;
   vec2 rainDistort = Rain(vec2(uv.y, 1.0-uv.x) * 5.0, t) * 0.5;
   rainDistort += Rain(vec2(uv.y, 1.0-uv.x) * 7.0, t) * 0.5;
-
   uv += rainDistort;
 
+  // Texture
   vec4 color = texture(u_image, uv);
 
-  vec3 normal = v_normal;
-  normal = (v_modelMatrix * vec4(normal, 0.0)).xyz;
-  normal = normalize(normal);
+  // Lighting
+  vec3 lightPositionWorld = vec3(1.0, 3.0, 3.0);
+
+  // Normal vector in view space
+  vec3 normal = normalize(v_fragNormal);
 
   // Ambient lighting
-  float ambient = 0.3;
+  float ambient = 0.37;
 
   // Diffuse lighting
-  vec3 lightPosition = vec3(0.0, 3.0, 10.0);
-  vec3 lightDirection = normalize(lightPosition);
+  vec3 lightPosition_view = (u_viewMatrix * vec4(lightPositionWorld, 1.0)).xyz;
+  vec3 lightDirection = normalize(lightPosition_view - v_fragPosition); 
   float diffuse = max(dot(normal, lightDirection), 0.0);
 
-  // Specular lighting
-  vec3 viewDirection = normalize(vec3(0.0, 0.0, 1.0) - normal);
-  vec3 reflectDirection = reflect(-lightDirection, normal);
-  float specular = pow(max(dot(viewDirection, reflectDirection), 0.0), 32.0);
-  
-  // Apply lighting
-  color.rgb *= diffuse;
-  color.rgb += specular;
-  color.rgb += ambient;
+  // View direction in view space
+  vec3 viewPosition = (u_viewMatrix * vec4(u_cameraPositionWorld, 1.0)).xyz;
+  vec3 viewDirection = normalize(v_fragPosition - viewPosition);
 
-  // Gamma correction
-  color.rgb = pow(color.rgb, vec3(1.0 / 0.55));
+  // Specular lighting
+  vec3 reflectDirection = reflect(lightDirection, normal);
+  float specularStrength = 0.5;
+  float shininess = 32.0;
+  float specular = pow(max(dot(viewDirection, reflectDirection), 0.0), shininess) * specularStrength;
+
+  // Apply lighting
+  vec3 lighting = vec3(ambient + diffuse + specular);
+  color.rgb *= lighting;
 
   outColor = color;
 }
