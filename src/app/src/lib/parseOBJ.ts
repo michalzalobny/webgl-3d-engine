@@ -13,14 +13,14 @@ export const parseOBJ = (text: string): GeometryObject => {
   const finalNormals: number[][] = [];
   const finalTexcoords: number[][] = [];
 
-  const lines = text.split("\n");
+  const lines = text.split('\n');
 
   for (let lineNo = 0; lineNo < lines.length; ++lineNo) {
     // Remove whitespace from both sides of a string
     const line = lines[lineNo].trim();
 
     // Skip comments and empty lines
-    if (line === "" || line.startsWith("#")) {
+    if (line === '' || line.startsWith('#')) {
       continue;
     }
 
@@ -29,7 +29,7 @@ export const parseOBJ = (text: string): GeometryObject => {
     const keyword = lineParts[0];
 
     // Load vertices_lookup
-    if (keyword === "v") {
+    if (keyword === 'v') {
       const x = parseFloat(lineParts[1]);
       const y = parseFloat(lineParts[2]);
       const z = parseFloat(lineParts[3]);
@@ -37,7 +37,7 @@ export const parseOBJ = (text: string): GeometryObject => {
     }
 
     // Load normals_lookup
-    if (keyword === "vn") {
+    if (keyword === 'vn') {
       const x = parseFloat(lineParts[1]);
       const y = parseFloat(lineParts[2]);
       const z = parseFloat(lineParts[3]);
@@ -45,20 +45,20 @@ export const parseOBJ = (text: string): GeometryObject => {
     }
 
     // Load texture coordinates lookup
-    if (keyword === "vt") {
+    if (keyword === 'vt') {
       const u = parseFloat(lineParts[1]);
       const v = parseFloat(lineParts[2]);
       texcoords_lookup.push([u, v]);
     }
 
     // Load face data. It's in the format of "f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3"
-    if (keyword === "f") {
+    if (keyword === 'f') {
       const faceVertices: number[][] = [];
       const faceNormals: number[][] = [];
       const faceTexcoords: number[][] = [];
 
       for (let i = 1; i < lineParts.length; ++i) {
-        const facePart = lineParts[i].split("/");
+        const facePart = lineParts[i].split('/');
 
         const vertexIndex = parseInt(facePart[0]);
         const vertex = vertices_lookup[vertexIndex - 1];
@@ -81,7 +81,7 @@ export const parseOBJ = (text: string): GeometryObject => {
   }
 
   return {
-    vertices: finalVertices.flat(),
+    vertices: finalVertices.flat().map((v) => v * 0.04),
     normals: finalNormals.flat(),
     texcoords: finalTexcoords.flat(),
   };

@@ -41,7 +41,7 @@ export class Mesh {
 
     this.gl = gl;
     this.shaderProgram = shaderProgram;
-    this.vertices = geometry.vertices.map((n) => n * 0.04);
+    this.vertices = geometry.vertices;
     this.normals = geometry.normals;
     this.texcoords = geometry.texcoords;
 
@@ -69,34 +69,38 @@ export class Mesh {
     });
 
     // Normal buffer
-    this.normalBuffer = createAndInitBuffer({
-      gl: this.gl,
-      target: this.gl.ARRAY_BUFFER,
-      data: new Float32Array(this.normals),
-    });
+    if (this.normals.length > 0) {
+      this.normalBuffer = createAndInitBuffer({
+        gl: this.gl,
+        target: this.gl.ARRAY_BUFFER,
+        data: new Float32Array(this.normals),
+      });
 
-    setupVertexAttribute({
-      gl: this.gl,
-      name: "a_normal",
-      program: this.shaderProgram.program,
-      buffer: this.normalBuffer,
-      size: 3,
-    });
+      setupVertexAttribute({
+        gl: this.gl,
+        name: "a_normal",
+        program: this.shaderProgram.program,
+        buffer: this.normalBuffer,
+        size: 3,
+      });
+    }
 
-    // UV buffer
-    this.uvBuffer = createAndInitBuffer({
-      gl: this.gl,
-      target: this.gl.ARRAY_BUFFER,
-      data: new Float32Array(this.texcoords),
-    });
+    if (this.texcoords.length > 0) {
+      // UV buffer
+      this.uvBuffer = createAndInitBuffer({
+        gl: this.gl,
+        target: this.gl.ARRAY_BUFFER,
+        data: new Float32Array(this.texcoords),
+      });
 
-    setupVertexAttribute({
-      gl: this.gl,
-      name: "a_uv",
-      program: this.shaderProgram.program,
-      buffer: this.uvBuffer,
-      size: 2,
-    });
+      setupVertexAttribute({
+        gl: this.gl,
+        name: "a_uv",
+        program: this.shaderProgram.program,
+        buffer: this.uvBuffer,
+        size: 2,
+      });
+    }
 
     // Unbind VAO
     this.gl.bindVertexArray(null);

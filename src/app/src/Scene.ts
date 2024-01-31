@@ -1,14 +1,18 @@
-import { vec3 } from "gl-matrix";
+import { vec3 } from 'gl-matrix';
 
-import fragmentShaderSource from "./shaders/default/fragment.glsl";
-import vertexShaderSource from "./shaders/default/vertex.glsl";
-import { globalState } from "./utils/globalState";
-import { ShaderProgram } from "./lib/ShaderProgram";
-import { Mesh } from "./lib/Mesh";
-import { Camera } from "./lib/Camera";
-import { lerp } from "./utils/lerp";
-import { TexturesManager } from "./lib/TexturesManager";
-import { GeometriesManager } from "./lib/GeometriesManager";
+import fragmentShaderSource from './shaders/default/fragment.glsl';
+import vertexShaderSource from './shaders/default/vertex.glsl';
+
+import fragmentShaderPostSource from './shaders/post/fragment.glsl';
+import vertexShaderPostSource from './shaders/post/vertex.glsl';
+
+import { globalState } from './utils/globalState';
+import { ShaderProgram } from './lib/ShaderProgram';
+import { Mesh } from './lib/Mesh';
+import { Camera } from './lib/Camera';
+import { lerp } from './utils/lerp';
+import { TexturesManager, TextureObject } from './lib/TexturesManager';
+import { GeometriesManager } from './lib/GeometriesManager';
 
 export class Scene {
   private gl: WebGL2RenderingContext | null = null;
@@ -22,16 +26,62 @@ export class Scene {
   private texturesManager;
   private geometriesManager = new GeometriesManager();
 
+  private postProcessShaderProgram: ShaderProgram | null = null;
+  private postProcessMesh: Mesh | null = null;
+
   constructor() {
     if (globalState.canvasEl) {
-      this.gl = globalState.canvasEl.getContext("webgl2");
+      this.gl = globalState.canvasEl.getContext('webgl2');
     }
-    if (!this.gl) throw new Error("WebGL2 not supported");
+    if (!this.gl) throw new Error('WebGL2 not supported');
 
     this.texturesManager = new TexturesManager({ gl: this.gl });
 
+    this.postProcess();
+
     void this.init();
     this.addEventListeners();
+  }
+
+  private postProcess() {
+    const { gl } = this;
+    if (!gl) return;
+    const { width, height } = gl.canvas;
+
+    // Create a texture to render to
+    this.texturesManager.createFrameBufferTexture(width, height, 'postProcessTexture');
+
+    this.postProcessShaderProgram = new ShaderProgram({
+      gl: this.gl,
+      fragmentCode: fragmentShaderPostSource,
+      vertexCode: vertexShaderPostSource,
+      texturesManager: this.texturesManager,
+      texturesToUse: [
+        {
+          textureSrc: 'postProcessTexture',
+          uniformName: 'u_image',
+        },
+      ],
+      uniforms: {
+        u_time: globalState.uTime,
+        u_resolution: globalState.stageSize,
+      },
+    });
+
+    // Plane made out of two triangles
+    const planeVertices = [-0.5, 0.5, 0, -0.5, -0.5, 0, 0.5, -0.5, 0, -0.5, 0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0];
+
+    const planeTexcoords = [0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1];
+
+    this.postProcessMesh = new Mesh({
+      gl,
+      shaderProgram: this.postProcessShaderProgram,
+      geometry: {
+        vertices: planeVertices,
+        normals: [],
+        texcoords: planeTexcoords,
+      },
+    });
   }
 
   private async init() {
@@ -39,16 +89,16 @@ export class Scene {
 
     await this.geometriesManager.addObjectsToLoad([
       // "/public/assets/models/crab/crab.obj",
-      "/public/assets/models/f22/f22.obj",
-      "/public/assets/models/efa/efa.obj",
+      '/public/assets/models/f22/f22.obj',
+      '/public/assets/models/efa/efa.obj',
       // "/public/assets/models/f117/f117.obj",
       // "/public/assets/models/cube/cube.obj",
     ]);
 
     await this.texturesManager.addTexturesToLoad([
       // "/public/assets/models/crab/crab.png",
-      "/public/assets/models/f22/f22.webp",
-      "/public/assets/models/efa/efa.webp",
+      '/public/assets/models/f22/f22.webp',
+      '/public/assets/models/efa/efa.webp',
       // "/public/assets/models/f117/f117.png",
       // "/public/assets/models/cube/cube.png",
     ]);
@@ -60,8 +110,8 @@ export class Scene {
       texturesManager: this.texturesManager,
       texturesToUse: [
         {
-          textureSrc: "/public/assets/models/efa/efa.webp",
-          uniformName: "u_image",
+          textureSrc: '/public/assets/models/efa/efa.webp',
+          uniformName: 'u_image',
         },
       ],
       uniforms: {
@@ -76,8 +126,8 @@ export class Scene {
       texturesManager: this.texturesManager,
       texturesToUse: [
         {
-          textureSrc: "/public/assets/models/f22/f22.webp",
-          uniformName: "u_image",
+          textureSrc: '/public/assets/models/f22/f22.webp',
+          uniformName: 'u_image',
         },
       ],
       uniforms: {
@@ -88,23 +138,25 @@ export class Scene {
     this.mesh = new Mesh({
       gl: this.gl,
       shaderProgram: this.shaderProgram,
-      geometry: this.geometriesManager.getGeometry(
-        "/public/assets/models/efa/efa.obj"
-      ),
+      geometry: this.geometriesManager.getGeometry('/public/assets/models/efa/efa.obj'),
     });
 
     this.mesh2 = new Mesh({
       gl: this.gl,
       shaderProgram: this.shaderProgram2,
-      geometry: this.geometriesManager.getGeometry(
-        "/public/assets/models/f22/f22.obj"
-      ),
+      geometry: this.geometriesManager.getGeometry('/public/assets/models/f22/f22.obj'),
     });
   }
 
   private render() {
     const gl = this.gl;
     if (!gl || !this.shaderProgram) return;
+
+    // Render to post process texture
+    const textureObj = this.texturesManager.getTextureObj('postProcessTexture');
+    if (textureObj && textureObj.frameBuffer) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, textureObj.frameBuffer);
+    }
 
     // Clear the canvas and depth buffer
     gl.clearColor(0, 0, 0, 0);
@@ -114,24 +166,12 @@ export class Scene {
     // Lerp mouse position
     const mouse2DTarget = globalState.mouse2DTarget.value;
     const mouse2DCurrent = globalState.mouse2DCurrent.value;
-    mouse2DCurrent[0] = lerp(
-      mouse2DCurrent[0],
-      mouse2DTarget[0],
-      0.06 * globalState.slowDownFactor.value
-    );
-    mouse2DCurrent[1] = lerp(
-      mouse2DCurrent[1],
-      mouse2DTarget[1],
-      0.06 * globalState.slowDownFactor.value
-    );
+    mouse2DCurrent[0] = lerp(mouse2DCurrent[0], mouse2DTarget[0], 0.06 * globalState.slowDownFactor.value);
+    mouse2DCurrent[1] = lerp(mouse2DCurrent[1], mouse2DTarget[1], 0.06 * globalState.slowDownFactor.value);
 
     // Update camera
     this.camera.updateViewMatrix({
-      target: vec3.fromValues(
-        mouse2DCurrent[0] * -0.25,
-        mouse2DCurrent[1] * 0.05,
-        -1
-      ),
+      target: vec3.fromValues(mouse2DCurrent[0] * -0.25, mouse2DCurrent[1] * 0.05, -1),
     });
 
     if (this.mesh) {
@@ -163,6 +203,14 @@ export class Scene {
 
       this.mesh2.render({ camera: this.camera });
     }
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    // Render plane where post process texture is applied
+    this.postProcessShaderProgram?.use();
+    this.postProcessMesh?.render({
+      camera: this.camera,
+    });
   }
 
   update() {
@@ -198,6 +246,8 @@ export class Scene {
       near: 0.1,
       far: 20,
     });
+
+    this.texturesManager.resize();
   }
 
   private onPointerClick = () => {
@@ -207,11 +257,11 @@ export class Scene {
   };
 
   private addEventListeners() {
-    window.addEventListener("pointerdown", this.onPointerClick);
+    window.addEventListener('pointerdown', this.onPointerClick);
   }
 
   private removeEventListeners() {
-    window.removeEventListener("pointerdown", this.onPointerClick);
+    window.removeEventListener('pointerdown', this.onPointerClick);
   }
 
   destroy() {
