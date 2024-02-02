@@ -34,7 +34,6 @@ export class Scene {
     this.texturesManager = new TexturesManager({ gl: this.gl });
     this.geometriesManager = new GeometriesManager();
 
-    this.postProcess();
     this.init();
   }
 
@@ -63,18 +62,10 @@ export class Scene {
       },
     });
 
-    // Plane made out of two triangles
-    const planeVertices = [-0.5, 0.5, 0, -0.5, -0.5, 0, 0.5, -0.5, 0, -0.5, 0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0];
-    const planeTexcoords = [0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1];
-
     this.postProcessMesh = new Mesh({
       gl,
       shaderProgram: this.postProcessShaderProgram,
-      geometry: {
-        vertices: planeVertices,
-        normals: [],
-        texcoords: planeTexcoords,
-      },
+      geometry: this.geometriesManager.getGeometry('plane'),
     });
   }
 
@@ -85,6 +76,15 @@ export class Scene {
       '/public/assets/models/f22/f22.obj',
       '/public/assets/models/efa/efa.obj',
     ]);
+
+    // Plane made out of two triangles
+    const planeVertices = [-0.5, 0.5, 0, -0.5, -0.5, 0, 0.5, -0.5, 0, -0.5, 0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0];
+    const planeTexcoords = [0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1];
+
+    this.geometriesManager.addGeometry({
+      geometryUrl: 'plane',
+      geometryObject: { vertices: planeVertices, texcoords: planeTexcoords, normals: [] },
+    });
 
     await this.texturesManager.addTexturesToLoad([
       '/public/assets/models/f22/f22.webp',
@@ -97,6 +97,8 @@ export class Scene {
       camera: this.camera,
       geometriesManager: this.geometriesManager,
     });
+
+    this.postProcess();
   }
 
   private render() {

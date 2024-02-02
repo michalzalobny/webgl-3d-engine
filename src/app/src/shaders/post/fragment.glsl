@@ -43,7 +43,7 @@ vec2 Rain(vec2 uv, float t){
     float m2 = S(0.3 * (0.5 - st.y), 0.0, d) * S( -.1, .1, st.y - p1.y);
 
     // if(st.x> .48 || st.y > .49) m1 = 1.0;
-    return vec2(m1 * o1 * 30.0 + m2 * o2 * 10.0);
+    return vec2(m1 * o1 * 10.0 + m2 * o2 * 2.0);
 }
 
 void main() {
@@ -58,8 +58,8 @@ void main() {
 
    // Rain effect
   float t = u_time * 0.1;
-  vec2 rainDistort = Rain(uv_aspect * 5.0, t) * 0.5;
-  rainDistort += Rain(uv_aspect * 7.0, t) * 0.5;
+  vec2 rainDistort = Rain(uv_aspect * 15.0, t) * 0.1;
+  rainDistort += Rain(uv_aspect * 9.0, t) * 0.4;
   uv += rainDistort;
 
   // Texture

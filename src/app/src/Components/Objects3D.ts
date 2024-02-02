@@ -10,6 +10,9 @@ import { Camera } from '../lib/Camera';
 import fragmentShaderSource from '../shaders/default/fragment.glsl';
 import vertexShaderSource from '../shaders/default/vertex.glsl';
 
+import bgFragment from '../shaders/background/fragment.glsl';
+import bgVertex from '../shaders/background/vertex.glsl';
+
 interface Constructor {
   gl: WebGL2RenderingContext | null;
   texturesManager: TexturesManager;
@@ -22,9 +25,11 @@ export class Objects3D {
 
   private jet1: Mesh | null = null;
   private jet2: Mesh | null = null;
+  private bgMesh: Mesh | null = null;
 
   private jetProgram1: ShaderProgram | null = null;
   private jetProgram2: ShaderProgram | null = null;
+  private bgProgram: ShaderProgram | null = null;
 
   private texturesManager: TexturesManager;
   private geometriesManager: GeometriesManager;
@@ -86,10 +91,33 @@ export class Objects3D {
       shaderProgram: this.jetProgram2,
       geometry: this.geometriesManager.getGeometry('/public/assets/models/f22/f22.obj'),
     });
+
+    this.bgProgram = new ShaderProgram({
+      gl: this.gl,
+      fragmentCode: bgFragment,
+      vertexCode: bgVertex,
+      texturesManager: this.texturesManager,
+      uniforms: {
+        u_time: globalState.uTime,
+      },
+    });
+
+    this.bgMesh = new Mesh({
+      gl: this.gl,
+      shaderProgram: this.bgProgram,
+      geometry: this.geometriesManager.getGeometry('plane'),
+    });
   }
 
   public update() {
     const mouse2DCurrent = globalState.mouse2DCurrent.value;
+
+    if (this.bgMesh) {
+      // Disable depth test when rendering the background - it will be behind everything
+      this.gl.disable(this.gl.DEPTH_TEST);
+      this.bgMesh.render({ camera: this.camera });
+      this.gl.enable(this.gl.DEPTH_TEST);
+    }
 
     if (this.jet1) {
       this.jet1.rotation[2] = -mouse2DCurrent[0] * 0.4;
@@ -125,6 +153,7 @@ export class Objects3D {
   public destroy() {
     if (this.jet1) this.jet1.destroy();
     if (this.jet2) this.jet2.destroy();
+    if (this.bgMesh) this.bgMesh.destroy();
     if (this.jetProgram1) this.jetProgram1.destroy();
     if (this.jetProgram2) this.jetProgram2.destroy();
   }
