@@ -30,7 +30,7 @@ export class TexturesManager {
     if (!this.gl) return;
   }
 
-  getTextureObj(textureUrl: string) {
+  public getTextureObj(textureUrl: string) {
     const textureObject = this.loadedTextures.get(textureUrl);
     if (!this.isReady) return null;
     if (!textureObject) {
@@ -111,7 +111,7 @@ export class TexturesManager {
     return this.loadedTextures.get(url);
   }
 
-  createFrameBufferTexture(width: number, height: number, name: string) {
+  public createFrameBufferTexture(width: number, height: number, name: string) {
     const gl = this.gl;
     if (!gl) return console.error('Cannot create frame buffer texture, WebGL context not available.');
 
@@ -171,7 +171,7 @@ export class TexturesManager {
     return this.loadedTextures.get(name);
   }
 
-  resizeFrameBufferTextures(width: number, height: number) {
+  private resizeFrameBufferTextures(width: number, height: number) {
     this.loadedTextures.forEach((textureObject) => {
       // Don't do anything if the texture does not have a frame buffer etc.
       if (!textureObject.frameBuffer || !textureObject.depthBuffer) return;
@@ -196,7 +196,7 @@ export class TexturesManager {
     });
   }
 
-  async addTexturesToLoad(texturesToLoad: string[]) {
+  public async addTexturesToLoad(texturesToLoad: string[]) {
     if (!this.gl) {
       return console.error('WebGL context not available for TexturesManager.');
     }
@@ -222,7 +222,7 @@ export class TexturesManager {
     });
   }
 
-  destroy() {
+  public destroy() {
     this.loadedTextures.forEach((textureObject) => {
       if (textureObject.texture) {
         this.gl?.deleteTexture(textureObject.texture);
@@ -239,7 +239,7 @@ export class TexturesManager {
     this.loadedTextures.clear();
   }
 
-  resize() {
+  public resize() {
     if (!this.gl) return;
     const width = this.gl.drawingBufferWidth || 0;
     const height = this.gl.drawingBufferHeight || 0;

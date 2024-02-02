@@ -1,4 +1,4 @@
-import { parseOBJ, GeometryObject } from "../lib/parseOBJ";
+import { parseOBJ, GeometryObject } from '../lib/parseOBJ';
 
 export class GeometriesManager {
   private isReady = false;
@@ -7,7 +7,7 @@ export class GeometriesManager {
 
   constructor() {}
 
-  getGeometry(geometryUrl: string) {
+  public getGeometry(geometryUrl: string) {
     const geometryObject = this.loadedGeometries.get(geometryUrl);
     if (!this.isReady) return null;
     if (!geometryObject) {
@@ -17,7 +17,7 @@ export class GeometriesManager {
     return geometryObject;
   }
 
-  async loadGeometry(elUrl: string) {
+  private async loadGeometry(elUrl: string) {
     const response = await fetch(elUrl);
     const text = await response.text();
     const objData = parseOBJ(text);
@@ -25,11 +25,9 @@ export class GeometriesManager {
     return Promise.resolve();
   }
 
-  async addObjectsToLoad(objsToLoad: string[]) {
+  public async addObjectsToLoad(objsToLoad: string[]) {
     if (this.startedLoading) {
-      console.error(
-        "Cannot add more objects to load. GeometriesManager has already started loading."
-      );
+      console.error('Cannot add more objects to load. GeometriesManager has already started loading.');
       return;
     }
 
@@ -44,7 +42,7 @@ export class GeometriesManager {
     });
   }
 
-  destroy() {
+  public destroy() {
     this.loadedGeometries.clear();
   }
 }

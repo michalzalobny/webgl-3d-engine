@@ -1,4 +1,4 @@
-import { mat4, vec3 } from "gl-matrix";
+import { mat4, vec3 } from 'gl-matrix';
 
 interface MakeProjectionMatrix {
   fov: number;
@@ -14,11 +14,11 @@ interface MakeLookAtMatrix {
 }
 
 export class Camera {
-  perspectiveProjectionMatrix = mat4.create();
-  orthoProjectionMatrix = mat4.create();
-  viewMatrix = mat4.create();
+  public perspectiveProjectionMatrix = mat4.create();
+  public orthoProjectionMatrix = mat4.create();
+  public viewMatrix = mat4.create();
 
-  position = vec3.fromValues(0, 0, 0.36);
+  public position = vec3.fromValues(0, 0, 0.36);
   private target = vec3.fromValues(0, 0, -1);
   private up = vec3.fromValues(0, 1, 0);
 
@@ -121,12 +121,12 @@ export class Camera {
     return out;
   }
 
-  updateProjectionMatrix(props: MakeProjectionMatrix) {
+  public updateProjectionMatrix(props: MakeProjectionMatrix) {
     this.perspectiveProjectionMatrix = this.makePerspectiveProjMatrix(props);
     this.orthoProjectionMatrix = this.makeOrthoProjMatrix(props);
   }
 
-  updateViewMatrix({ eye, target, up }: MakeLookAtMatrix) {
+  public updateViewMatrix({ eye, target, up }: MakeLookAtMatrix) {
     this.viewMatrix = this.makeLookAtMatrix({ eye, target, up });
   }
 }

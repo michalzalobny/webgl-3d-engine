@@ -136,11 +136,11 @@ export class Scene {
     });
   }
 
-  update() {
+  public update() {
     this.render();
   }
 
-  onResize() {
+  public onResize() {
     let w = globalState.stageSize.value[0];
     let h = globalState.stageSize.value[1];
 
@@ -173,7 +173,7 @@ export class Scene {
     this.texturesManager.resize();
   }
 
-  destroy() {
+  public destroy() {
     this.geometriesManager?.destroy();
     this.texturesManager?.destroy();
 

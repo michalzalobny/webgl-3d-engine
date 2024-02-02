@@ -29,9 +29,9 @@ export class Mesh {
 
   private modelMatrix = mat4.create();
 
-  position = vec3.fromValues(0, 0, 0);
-  scale = vec3.fromValues(1, 1, 1);
-  rotation = vec3.fromValues(0, 0, 0);
+  public position = vec3.fromValues(0, 0, 0);
+  public scale = vec3.fromValues(1, 1, 1);
+  public rotation = vec3.fromValues(0, 0, 0);
 
   constructor(props: Constructor) {
     const { gl, shaderProgram, geometry } = props;
@@ -105,7 +105,7 @@ export class Mesh {
     this.gl.bindVertexArray(null);
   }
 
-  render(props: Render) {
+  public render(props: Render) {
     const { camera } = props;
 
     this.shaderProgram.use();
@@ -135,7 +135,7 @@ export class Mesh {
     this.gl.activeTexture(this.gl.TEXTURE0);
   }
 
-  destroy() {
+  public destroy() {
     this.gl.deleteBuffer(this.positionBuffer);
     this.gl.deleteBuffer(this.normalBuffer);
     this.gl.deleteBuffer(this.uvBuffer);

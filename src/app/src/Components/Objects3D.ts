@@ -122,7 +122,7 @@ export class Objects3D {
     }
   }
 
-  destroy() {
+  public destroy() {
     if (this.jet1) this.jet1.destroy();
     if (this.jet2) this.jet2.destroy();
     if (this.jetProgram1) this.jetProgram1.destroy();

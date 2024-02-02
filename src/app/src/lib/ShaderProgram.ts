@@ -24,13 +24,13 @@ export class ShaderProgram {
   private vertexCode: string;
   private fragmentCode: string;
   private gl: WebGL2RenderingContext;
-  program: WebGLProgram | null = null;
+  public program: WebGLProgram | null = null;
   private texturesManager;
 
-  uniformLocations = new Map<string, WebGLUniformLocation>();
+  private uniformLocations = new Map<string, WebGLUniformLocation>();
 
-  texturesToUse: TextureToUse[] = [];
-  uniforms: Uniforms = {};
+  public texturesToUse: TextureToUse[] = [];
+  private uniforms: Uniforms = {};
 
   constructor(props: Props) {
     const { vertexCode, fragmentCode, gl, texturesToUse, texturesManager, uniforms } = props;
@@ -89,7 +89,7 @@ export class ShaderProgram {
     this.program = program;
   }
 
-  getUniformLocation(name: string) {
+  private getUniformLocation(name: string) {
     if (!this.program) {
       throw new Error('Cannot get uniform location, program not initialized');
     }
@@ -106,7 +106,7 @@ export class ShaderProgram {
     return cachedLocation;
   }
 
-  setUniform1f(name: string, value: number) {
+  public setUniform1f(name: string, value: number) {
     const location = this.getUniformLocation(name);
     if (!location) {
       return undefined;
@@ -114,7 +114,7 @@ export class ShaderProgram {
     this.gl.uniform1f(location, value);
   }
 
-  setUniform4f(name: string, value: [number, number, number, number]) {
+  public setUniform4f(name: string, value: [number, number, number, number]) {
     const location = this.getUniformLocation(name);
     if (!location) {
       return undefined;
@@ -122,7 +122,7 @@ export class ShaderProgram {
     this.gl.uniform4f(location, value[0], value[1], value[2], value[3]);
   }
 
-  setUniform2f(name: string, value: [number, number] | Float32Array) {
+  public setUniform2f(name: string, value: [number, number] | Float32Array) {
     const location = this.getUniformLocation(name);
     if (!location) {
       return undefined;
@@ -130,7 +130,7 @@ export class ShaderProgram {
     this.gl.uniform2f(location, value[0], value[1]);
   }
 
-  setUniform3f(name: string, value: [number, number, number] | Float32Array) {
+  public setUniform3f(name: string, value: [number, number, number] | Float32Array) {
     const location = this.getUniformLocation(name);
     if (!location) {
       return undefined;
@@ -138,7 +138,7 @@ export class ShaderProgram {
     this.gl.uniform3f(location, value[0], value[1], value[2]);
   }
 
-  setUniformMatrix4fv(name: string, value: Float32Array | number[]) {
+  public setUniformMatrix4fv(name: string, value: Float32Array | number[]) {
     const location = this.getUniformLocation(name);
     if (!location) {
       return undefined;
@@ -146,7 +146,7 @@ export class ShaderProgram {
     this.gl.uniformMatrix4fv(location, false, value);
   }
 
-  use() {
+  public use() {
     if (!this.program) {
       throw new Error('Cannot use program, program is not set');
     }
@@ -184,7 +184,7 @@ export class ShaderProgram {
     });
   }
 
-  destroy() {
+  public destroy() {
     this.gl.deleteProgram(this.program);
   }
 }

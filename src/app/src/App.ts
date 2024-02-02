@@ -1,7 +1,7 @@
-import { globalState } from "./utils/globalState";
-import { constants } from "./utils/constants";
-import { debounce } from "./utils/debounce";
-import { Scene } from "./Scene";
+import { globalState } from './utils/globalState';
+import { constants } from './utils/constants';
+import { debounce } from './utils/debounce';
+import { Scene } from './Scene';
 
 export class App {
   private rafId: number | null = null;
@@ -42,8 +42,8 @@ export class App {
   };
 
   private addListeners() {
-    window.addEventListener("resize", this.onResizeDebounced);
-    window.addEventListener("visibilitychange", this.onVisibilityChange);
+    window.addEventListener('resize', this.onResizeDebounced);
+    window.addEventListener('visibilitychange', this.onVisibilityChange);
   }
 
   private resumeAppFrame() {
@@ -79,10 +79,10 @@ export class App {
     }
   }
 
-  destroy() {
+  public destroy() {
     this.stopAppFrame();
-    window.removeEventListener("resize", this.onResizeDebounced);
-    window.removeEventListener("visibilitychange", this.onVisibilityChange);
+    window.removeEventListener('resize', this.onResizeDebounced);
+    window.removeEventListener('visibilitychange', this.onVisibilityChange);
     this.scene.destroy();
   }
 }
