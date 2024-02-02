@@ -1,10 +1,9 @@
-import { mat4, vec3 } from "gl-matrix";
+import { mat4, vec3 } from 'gl-matrix';
 
-import { ShaderProgram } from "./ShaderProgram";
-import { createAndInitBuffer, setupVertexAttribute } from "./Util";
-import { Camera } from "./Camera";
-import { GeometryObject } from "./parseOBJ";
-import { globalState } from "../utils/globalState";
+import { ShaderProgram } from './ShaderProgram';
+import { createAndInitBuffer, setupVertexAttribute } from './Util';
+import { Camera } from './Camera';
+import { GeometryObject } from './parseOBJ';
 
 interface Constructor {
   geometry: GeometryObject | null;
@@ -37,7 +36,7 @@ export class Mesh {
   constructor(props: Constructor) {
     const { gl, shaderProgram, geometry } = props;
 
-    if (!geometry) throw new Error("No geometry provided for the Mesh");
+    if (!geometry) throw new Error('No geometry provided for the Mesh');
 
     this.gl = gl;
     this.shaderProgram = shaderProgram;
@@ -62,7 +61,7 @@ export class Mesh {
 
     setupVertexAttribute({
       gl: this.gl,
-      name: "a_position",
+      name: 'a_position',
       program: this.shaderProgram.program,
       buffer: this.positionBuffer,
       size: 3,
@@ -78,7 +77,7 @@ export class Mesh {
 
       setupVertexAttribute({
         gl: this.gl,
-        name: "a_normal",
+        name: 'a_normal',
         program: this.shaderProgram.program,
         buffer: this.normalBuffer,
         size: 3,
@@ -95,7 +94,7 @@ export class Mesh {
 
       setupVertexAttribute({
         gl: this.gl,
-        name: "a_uv",
+        name: 'a_uv',
         program: this.shaderProgram.program,
         buffer: this.uvBuffer,
         size: 2,
@@ -121,18 +120,12 @@ export class Mesh {
     mat4.rotateZ(this.modelMatrix, this.modelMatrix, this.rotation[2]);
 
     // Load model matrix, view matrix and projection matrix to shader
-    this.shaderProgram.setUniformMatrix4fv("u_modelMatrix", this.modelMatrix);
-    this.shaderProgram.setUniformMatrix4fv("u_viewMatrix", camera.viewMatrix);
-    this.shaderProgram.setUniform3f("u_cameraPositionWorld", camera.position);
-    this.shaderProgram.setUniformMatrix4fv(
-      "u_projectionMatrix",
-      camera.perspectiveProjectionMatrix
-    );
+    this.shaderProgram.setUniformMatrix4fv('u_modelMatrix', this.modelMatrix);
+    this.shaderProgram.setUniformMatrix4fv('u_viewMatrix', camera.viewMatrix);
+    this.shaderProgram.setUniform3f('u_cameraPositionWorld', camera.position);
+    this.shaderProgram.setUniformMatrix4fv('u_projectionMatrix', camera.perspectiveProjectionMatrix);
 
-    const drawMode = [this.gl.TRIANGLES, this.gl.LINES, this.gl.POINTS][
-      globalState.drawMode
-    ];
-    this.gl.drawArrays(drawMode, 0, this.vertices.length / 3);
+    this.gl.drawArrays(this.gl.TRIANGLES, 0, this.vertices.length / 3);
 
     // Unbind VAO
     this.gl.bindVertexArray(null);

@@ -1,10 +1,8 @@
-import { globalState } from '../utils/globalState';
-
 interface Constructor {
   gl: WebGL2RenderingContext | null;
 }
 
-export interface TextureObject {
+interface TextureObject {
   width: number;
   height: number;
   textureIndex: number;

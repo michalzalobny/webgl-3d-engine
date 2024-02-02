@@ -1,4 +1,4 @@
-import { App } from "../App";
+import { App } from '../App';
 
 export const globalState = {
   stageSize: {
@@ -22,5 +22,4 @@ export const globalState = {
   app: null as App | null,
   debugHolderEl: null as HTMLDivElement | null,
   canvasEl: null as HTMLCanvasElement | null,
-  drawMode: 0,
 };

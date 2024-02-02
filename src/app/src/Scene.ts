@@ -1,8 +1,5 @@
 import { vec3 } from 'gl-matrix';
 
-import fragmentShaderSource from './shaders/default/fragment.glsl';
-import vertexShaderSource from './shaders/default/vertex.glsl';
-
 import fragmentShaderPostSource from './shaders/post/fragment.glsl';
 import vertexShaderPostSource from './shaders/post/vertex.glsl';
 
@@ -11,20 +8,19 @@ import { ShaderProgram } from './lib/ShaderProgram';
 import { Mesh } from './lib/Mesh';
 import { Camera } from './lib/Camera';
 import { lerp } from './utils/lerp';
-import { TexturesManager, TextureObject } from './lib/TexturesManager';
+import { TexturesManager } from './lib/TexturesManager';
 import { GeometriesManager } from './lib/GeometriesManager';
+
+import { Objects3D } from './Components/Objects3D';
 
 export class Scene {
   private gl: WebGL2RenderingContext | null = null;
   private camera = new Camera();
 
-  private mesh: Mesh | null = null;
-  private mesh2: Mesh | null = null;
-  private shaderProgram: ShaderProgram | null = null;
-  private shaderProgram2: ShaderProgram | null = null;
-
   private texturesManager;
-  private geometriesManager = new GeometriesManager();
+  private geometriesManager;
+
+  private objects3D: Objects3D | null = null;
 
   private postProcessShaderProgram: ShaderProgram | null = null;
   private postProcessMesh: Mesh | null = null;
@@ -36,11 +32,10 @@ export class Scene {
     if (!this.gl) throw new Error('WebGL2 not supported');
 
     this.texturesManager = new TexturesManager({ gl: this.gl });
+    this.geometriesManager = new GeometriesManager();
 
     this.postProcess();
-
-    void this.init();
-    this.addEventListeners();
+    this.init();
   }
 
   private postProcess() {
@@ -70,7 +65,6 @@ export class Scene {
 
     // Plane made out of two triangles
     const planeVertices = [-0.5, 0.5, 0, -0.5, -0.5, 0, 0.5, -0.5, 0, -0.5, 0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0];
-
     const planeTexcoords = [0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1];
 
     this.postProcessMesh = new Mesh({
@@ -88,69 +82,26 @@ export class Scene {
     if (!this.gl) return;
 
     await this.geometriesManager.addObjectsToLoad([
-      // "/public/assets/models/crab/crab.obj",
       '/public/assets/models/f22/f22.obj',
       '/public/assets/models/efa/efa.obj',
-      // "/public/assets/models/f117/f117.obj",
-      // "/public/assets/models/cube/cube.obj",
     ]);
 
     await this.texturesManager.addTexturesToLoad([
-      // "/public/assets/models/crab/crab.png",
       '/public/assets/models/f22/f22.webp',
       '/public/assets/models/efa/efa.webp',
-      // "/public/assets/models/f117/f117.png",
-      // "/public/assets/models/cube/cube.png",
     ]);
 
-    this.shaderProgram = new ShaderProgram({
+    this.objects3D = new Objects3D({
       gl: this.gl,
-      fragmentCode: fragmentShaderSource,
-      vertexCode: vertexShaderSource,
       texturesManager: this.texturesManager,
-      texturesToUse: [
-        {
-          textureSrc: '/public/assets/models/efa/efa.webp',
-          uniformName: 'u_image',
-        },
-      ],
-      uniforms: {
-        u_time: globalState.uTime,
-      },
-    });
-
-    this.shaderProgram2 = new ShaderProgram({
-      gl: this.gl,
-      fragmentCode: fragmentShaderSource,
-      vertexCode: vertexShaderSource,
-      texturesManager: this.texturesManager,
-      texturesToUse: [
-        {
-          textureSrc: '/public/assets/models/f22/f22.webp',
-          uniformName: 'u_image',
-        },
-      ],
-      uniforms: {
-        u_time: globalState.uTime,
-      },
-    });
-
-    this.mesh = new Mesh({
-      gl: this.gl,
-      shaderProgram: this.shaderProgram,
-      geometry: this.geometriesManager.getGeometry('/public/assets/models/efa/efa.obj'),
-    });
-
-    this.mesh2 = new Mesh({
-      gl: this.gl,
-      shaderProgram: this.shaderProgram2,
-      geometry: this.geometriesManager.getGeometry('/public/assets/models/f22/f22.obj'),
+      camera: this.camera,
+      geometriesManager: this.geometriesManager,
     });
   }
 
   private render() {
     const gl = this.gl;
-    if (!gl || !this.shaderProgram) return;
+    if (!gl) return;
 
     // Render to post process texture
     const textureObj = this.texturesManager.getTextureObj('postProcessTexture');
@@ -174,35 +125,7 @@ export class Scene {
       target: vec3.fromValues(mouse2DCurrent[0] * -0.25, mouse2DCurrent[1] * 0.05, -1),
     });
 
-    if (this.mesh) {
-      this.mesh.rotation[2] = -mouse2DCurrent[0] * 0.4;
-      this.mesh.rotation[0] = mouse2DCurrent[1] * 3.2;
-
-      const floatY = Math.sin(globalState.uTime.value * 1.2) * 0.035;
-
-      this.mesh.position = vec3.fromValues(
-        mouse2DCurrent[0] * -0.5,
-        mouse2DCurrent[1] * -0.1 + floatY - 0.03,
-        -mouse2DCurrent[1] * 0.25 - 0.02
-      );
-
-      this.mesh.render({ camera: this.camera });
-    }
-
-    if (this.mesh2) {
-      this.mesh2.rotation[2] = mouse2DCurrent[0] * 0.8;
-      this.mesh2.rotation[0] = -mouse2DCurrent[1] * 1.2;
-
-      const floatY = Math.sin(globalState.uTime.value * 1.6) * 0.02;
-
-      this.mesh2.position = vec3.fromValues(
-        mouse2DCurrent[0] * 0.5,
-        mouse2DCurrent[1] * 0.1 + floatY + 0.03,
-        mouse2DCurrent[1] * 0.2 - 0.05
-      );
-
-      this.mesh2.render({ camera: this.camera });
-    }
+    this.objects3D?.update();
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
@@ -250,30 +173,10 @@ export class Scene {
     this.texturesManager.resize();
   }
 
-  private onPointerClick = () => {
-    // Limit to 3 draw modes
-    globalState.drawMode += 1;
-    globalState.drawMode %= 3;
-  };
-
-  private addEventListeners() {
-    window.addEventListener('pointerdown', this.onPointerClick);
-  }
-
-  private removeEventListeners() {
-    window.removeEventListener('pointerdown', this.onPointerClick);
-  }
-
   destroy() {
-    this.shaderProgram?.destroy();
-    this.shaderProgram2?.destroy();
-
-    this.mesh?.destroy();
-    this.mesh2?.destroy();
-
     this.geometriesManager?.destroy();
     this.texturesManager?.destroy();
 
-    this.removeEventListeners();
+    this.objects3D?.destroy();
   }
 }
