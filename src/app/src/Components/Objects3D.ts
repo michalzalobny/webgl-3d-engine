@@ -99,6 +99,7 @@ export class Objects3D {
       texturesManager: this.texturesManager,
       uniforms: {
         u_time: globalState.uTime,
+        u_resolution: globalState.stageSize,
       },
     });
 
