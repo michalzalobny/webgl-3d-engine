@@ -97,7 +97,7 @@ void main() {
   // Texture
   vec4 color = texture(u_image, uv);
 
-  color = mix(color, vec4(c), 0.2);
+  color = mix(color, vec4(c), 0.02);
   
   outColor = color;
 }
