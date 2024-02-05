@@ -90,7 +90,7 @@ void main() {
   float t = u_time * 0.1;
   vec2 rainDistort = Rain(uv_aspect * 15.0, t) * 0.1;
   rainDistort += Rain(uv_aspect * 9.0, t) * 0.4;
-  uv += rainDistort;
+  uv += rainDistort *0.4;
 
   float c = SmoothNoise2(vec2(uv_aspect.x + t * 1.3, uv_aspect.y + t *0.1));
   
