@@ -106,10 +106,10 @@ export class Scene {
     if (!gl) return;
 
     // Render to post process texture
-    const textureObj = this.texturesManager.getTextureObj('postProcessTexture');
-    if (textureObj && textureObj.frameBuffer) {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, textureObj.frameBuffer);
-    }
+    // const textureObj = this.texturesManager.getTextureObj('postProcessTexture');
+    // if (textureObj && textureObj.frameBuffer) {
+    //   gl.bindFramebuffer(gl.FRAMEBUFFER, textureObj.frameBuffer);
+    // }
 
     // Clear the canvas and depth buffer
     gl.clearColor(0, 0, 0, 0);
@@ -129,13 +129,13 @@ export class Scene {
 
     this.objects3D?.update();
 
+    // Post process 2nd part
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
     // Render plane where post process texture is applied
-    this.postProcessShaderProgram?.use();
-    this.postProcessMesh?.render({
-      camera: this.camera,
-    });
+    // this.postProcessShaderProgram?.use();
+    // this.postProcessMesh?.render({
+    //   camera: this.camera,
+    // });
   }
 
   public update() {
