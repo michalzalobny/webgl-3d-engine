@@ -21,23 +21,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   mouseMove.addEventListener('mousemove', onMouseMove);
 
-  const askForPassword = () => {
-    const password = prompt('Enter the password:', '');
+  // const askForPassword = () => {
+  //   const password = prompt('Enter the password:', '');
 
-    if (password == correctPass) {
-      localStorage.setItem('lsPassword', correctPass);
-    } else {
-      askForPassword();
-    }
-  };
+  //   if (password == correctPass) {
+  //     localStorage.setItem('lsPassword', correctPass);
+  //   } else {
+  //     askForPassword();
+  //   }
+  // };
 
-  const correctPass = 'pass';
-  const lsPassword = localStorage.getItem('lsPassword');
+  // const correctPass = 'pass';
+  // const lsPassword = localStorage.getItem('lsPassword');
 
-  if (lsPassword === correctPass) {
-  } else {
-    askForPassword();
-  }
+  // if (lsPassword === correctPass) {
+  // } else {
+  //   askForPassword();
+  // }
 
   // const { App } = await import("./App");
   globalState.app = new App();
